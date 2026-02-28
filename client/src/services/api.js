@@ -38,24 +38,6 @@ export const api = {
     });
     return response.json();
   },
-
-  // Get time compatibility between two users
-  getTimeCompatibility: async (userId1, userId2) => {
-    const response = await fetch(`${API_BASE_URL}/users/${userId1}/compatibility/${userId2}`);
-    return response.json();
-  },
-
-  // Get user calendar events
-  getUserCalendarEvents: async (userId) => {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/calendar/events`);
-    return response.json();
-  },
-
-  // Get Google Auth URL
-  getGoogleAuthUrl: async () => {
-    const response = await fetch(`${API_BASE_URL}/auth/google`);
-    return response.json();
-  },
 };
 
 export default api;
