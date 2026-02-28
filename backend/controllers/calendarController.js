@@ -1,6 +1,6 @@
 // calendarController.js - handles routes for calendar integration (OAuth and events)
-const googleCalendar = require('../utils/googleCalendar');
-const tokenStore = require('../utils/tokenStore');
+const googleCalendar = require('../../server/utils/googleCalendar');
+const tokenStore = require('../../server/utils/tokenStore');
 
 // Return an auth URL to start OAuth flow
 exports.getAuthUrl = (req, res) => {
