@@ -366,13 +366,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/login/page" element={<LoginPage />} />
-<<<<<<< HEAD
-          <Route path="/signup" element={<Signup />} />
-          {/* <Route path="/user" element={<User />} /> */}
-          <Route path="/" element={
-            <>
-=======
->>>>>>> 31c33d3aba8c3c9462474b0cd1152ef093795dff
 
           <Route path="/" element={<Home />} />
           <Route
