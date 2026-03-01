@@ -1,62 +1,34 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { useState } from "react"
-import Login from "./login.jsx"
-import LoginPage from "./components/loginpage.jsx"
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import Login from "./login.jsx";
+import LoginPage from "./components/loginpage.jsx";
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #eeddc2ff; font-family: sans-serif; width: 100%; }
 
-  :root {
-    --cream: #F5F0E8;
-    --brown-dark: #5C1E0A;
-    --brown-mid: #8B3A10;
-    --brown-light: #C26020;
-    --brown-accent: #D4722A;
-    --card-bg: #FDFAF4;
-    --border: rgba(92, 30, 10, 0.1);
+  .top-nav {
+    width: 100vw;          /* stretch across the screen */
+    display: flex;
+    align-items: center;   /* vertical centering of items inside */
+    justify-content: center; /* horizontal centering */
+    padding: 20px 0;       /* top/bottom padding only */
+    background: #ff002bff;
   }
-  
+
   .home-screen {
-    background: var(--cream);
+    background: #452d08ff;
     font-family: 'DM Sans', sans-serif;
     display: flex;
     flex-direction: column;
-    position: relative;
+    justify-content: center;  /* vertical centering */
+    align-items: center;      /* horizontal centering */
+    min-height: calc(100vh - 80px); /* full viewport minus top nav height */
+    width: 100vw;              /* full width */
   }
-  
-  .top-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 24px 16 px;
-    gap: 10px;
-    border-bottom: 1px solid rgba(200, 160, 80, 0.25);
-  }
+`;
 
-  .nav-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--brown-dark);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .nav-title {
-    font-family: 'Playfair Display', serif;
-    font=size: 22px;
-    font-weight: 600;
-    color: var(--brown-dark);
-    letter-spacing: 0.3px;
-  }
-
-`
-
-const CalendarIcon = ({ color = "#fff", size = 20 }) => {
+const CalendarIcon = ({ color = "#000", size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <rect x="3" y="4" width="18" height="17" rx="3" stroke={color} strokeWidth="2" />
     <path d="M8 2v4M16 2v4M3 9h18" stroke={color} strokeWidth="2" strokeLinecap="round" />
@@ -64,10 +36,14 @@ const CalendarIcon = ({ color = "#fff", size = 20 }) => {
     <circle cx="12" cy="14" r="1.5" fill={color} />
     <circle cx="16" cy="14" r="1.5" fill={color} />
   </svg>
-}
+);
 
+// Dummy icons so app runs
+const HomeIcon = () => <div>🏠</div>;
+const MatchIcon = () => <div>💖</div>;
+const ProfileIcon = () => <div>👤</div>;
 
-//Home page 
+// Home page
 function App() {
   const [activeTab, setActiveTab] = useState("home");
 
@@ -79,16 +55,34 @@ function App() {
   ];
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/login/page" element={<LoginPage />} />
-        <Route path="/" element={<h1>yay</h1>} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <style>{styles}</style>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/login/page" element={<LoginPage />} />
+          <Route path="/" element={
+            <>
+              <div className="top-nav">
+                <h1>FriendZone</h1>
+              </div>
+              <div className="home-screen">
+                <h1>Explore</h1>
+                <div className="home-grid">
+                  <div className="grid-box">Box 1</div>
+                  <div className="grid-box">Box 2</div>
+                  <div className="grid-box">Box 3</div>
+                  <div className="grid-box">Box 4</div>
+                </div>
 
+              </div>
+            </>
 
-  )
+          } />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 
-export default App 
+export default App;
