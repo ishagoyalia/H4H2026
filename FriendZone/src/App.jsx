@@ -61,16 +61,27 @@ const styles = `
     background: var(--card-bg);
     vorder: 1px solid var(--border);
     border-radius: 50px;
-    padding; 10px 20px;
+    padding; 5px 20px;
     display: flex;
     align-items: cetner;
     gap: 7px;
   }
 
-  .stat-offline
-  
-  .stat-online
-  .stat-text
+  .stat-online {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-offline {
+    background: var(--brown-light);
+  }
+  .stat-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5C1E0A;
+  }
 `
 
 const CalendarIcon = ({ color="#fff", size=20 }) => {
@@ -101,14 +112,16 @@ function App() {
                 <span className="nav-title">FriendZone</span>
               </div>
               
-              <div className="stats-row">
-                <div className="stat">
-                  <div className="stat-online" />
-                  <span className="stat-text">3 friends online</span>
-                </div>
-                <div classname="stat">
-                  <div className="stat-total" />
-                  <span calssname="stat-text">6 friends total</span>
+              <div className="main-content">
+                <div className="stats-row">
+                  <div className="stat">
+                    <div className="stat-text">
+                      <h2 className="stat-online"> 3 friends free right now </h2>
+                      <br></br>
+                      <h2 className="stat-offline"> 6 friends total </h2>
+                    </div>
+                  </div> 
+                  
                 </div>
               </div>
             </div>
