@@ -4,7 +4,7 @@ import { api } from "../services/api.js"  // Import the api service
 
 // Weight mappings for combinedScore calculation
 
-const hobbyWeights = [
+const interests = [
     // Sports hobbies
     'basketball',
     'football',
@@ -33,16 +33,8 @@ export default function signup() {
     const handleHobbiesChange = e => setHobbies(e.target.value)
 
     const handleSubmit = async () => {
-        // Get weights for selected options
-        const hobbyWeight = hobbyWeights[hobbies] || 0;
+        console.log('Selected hobby:', hobbies);
 
-        // Combine weights for combinedScore
-        const weights = {
-            hobbies,
-            hobbyWeight,
-        };
-
-        console.log('Weights for combinedScore:', weights);
         // Resolve userId: prefer locally stored id (set at login), then prefer Google provider ID, fallback to Firebase user UID
         let userId = localStorage.getItem('userId');
         if (!userId) {
@@ -64,8 +56,8 @@ export default function signup() {
             }
         }
 
-        // Send weights to backend for the authenticated user
-        await api.updateProfile(userId, { weights });
+        // Save single interest as array for matching algorithm
+        await api.updateProfile(userId, { interests: [hobbies] });
     }
     return (
         <div>
