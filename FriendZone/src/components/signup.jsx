@@ -4,26 +4,27 @@ import { api } from "../services/api.js"  // Import the api service
 
 // Weight mappings for combinedScore calculation
 
-const hobbyWeights = {
+const hobbyWeights = [
     // Sports hobbies
-    'basketball': 1,
-    'football': 1,
-    'baseball': 1,
-    'tennis': 1,
-    'swimming': 1,
+    'basketball',
+    'football',
+    'baseball',
+    'tennis',
+    'swimming',
     // Social life hobbies
-    'music': 1,
-    'dancing': 1,
-    'cooking': 1,
-    'traveling': 1,
-    'gaming': 1,
+    'music',
+    'dancing',
+    'cooking',
+    'traveling',
+    'gaming',
     // Academics hobbies
-    'math': 1,
-    'science': 1,
-    'literature': 1,
-    'history': 1,
-    'art': 1,
-};
+    'math',
+    'science',
+    'literature',
+    'history',
+    'art'
+];
+
 
 const mbtiWeights = 1; // Placeholder for MBTI weights if needed in the future
 
