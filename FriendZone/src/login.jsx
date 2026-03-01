@@ -1,4 +1,4 @@
-//@5:53, edited login.jsx to handle pop up google login EDITED
+//@5:53, edited login.jsx to handle pop up google login 
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api } from "../services/api"  // Import the api service
@@ -35,7 +35,7 @@ export default function Login() {
     }
 
     return (
-        <div style={{ textAlign: 'center', padding: '50px' }}>
+        <div>
             <h1>Welcome to FriendZone</h1>
 
             {error && <p style={{ color: 'red', marginBottom: '20px' }}>{error}</p>}
