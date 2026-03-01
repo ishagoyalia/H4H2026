@@ -1,6 +1,6 @@
 // googleCalendar.js edits - handles OAuth flow and calendar API calls
 // gets actual raw data from google calendar api 
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
 const createOAuthClient = () => {
   return new google.auth.OAuth2(
@@ -47,7 +47,7 @@ async function listEvents(tokens, { calendarId = 'primary', timeMin, timeMax, ma
   return res.data.items || [];
 }
 
-module.exports = {
+export {
   generateAuthUrl,
   getTokensFromCode,
   listEvents,
