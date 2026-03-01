@@ -190,12 +190,12 @@ export const api = {
     },
 
     getProfile: async (userId) => {
-        const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
         return response.json();
     },
 
     updateProfile: async (userId, profileData) => {
-        const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(profileData),
