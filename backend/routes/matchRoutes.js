@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // const express = require('express');
 // const router = express.Router();
 // const matchController = require('../controllers/matchController');
@@ -17,6 +18,11 @@ const express = require("express");
 
 // Create a router object (like a mini server just for matches)
 const router = express.Router();
+=======
+import express from 'express';
+const router = express.Router();
+import * as matchController from '../controllers/matchController.js';
+>>>>>>> Stashed changes
 
 // Import the controller functions that actually do the work
 // These functions contain the matching logic or database calls
@@ -30,6 +36,7 @@ const {
 // Express will extract "123" and store it in req.params.userId
 router.get("/:userId", getMatches);
 
+<<<<<<< Updated upstream
 
 // OPTIONAL route for getting a random match
 // Example request: GET /api/matches/random/123
@@ -38,3 +45,6 @@ router.get("/random/:userId", getRandomMatch);
 
 // Export this router so server.js can use it
 module.exports = router;
+=======
+export default router;
+>>>>>>> Stashed changes

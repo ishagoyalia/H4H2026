@@ -19,9 +19,9 @@
  *   const matches = findBestMatches(user, allUsers); // 40% interests, 30% schedule, 30% MBTI
  */
 
-const matchAlgorithm = require('./matchAlgorithm');
-const scheduleAlgorithm = require('./scheduleAlgorithm');
-const mbtiAlgorithm = require('./mbtiAlgorithm');
+import * as matchAlgorithm from './interestsAlgorithm.js';
+import * as scheduleAlgorithm from './gcalAlgorithm.js';
+import * as mbtiAlgorithm from './mbtiAlgorithm.js';
 
 /**
  * Find best overall matches combining all factors
@@ -32,33 +32,33 @@ const mbtiAlgorithm = require('./mbtiAlgorithm');
  *                               Example: { interests: 50, schedule: 30, mbti: 20 }
  * @returns {Array} - Ranked matches with combined scores
  */
-exports.findBestMatches = (user, allUsers, userWeights = null) => {
+export function findBestMatches(user, allUsers, userWeights = null) {
   // Default weights (must add up to 1.0)
   const defaultWeights = {
     interests: 0.4,    // 40% weight on shared interests
     schedule: 0.3,     // 30% weight on schedule overlap
     mbti: 0.3,         // 30% weight on personality compatibility
   };
-  
+
   // Process and normalize user weights if provided
-  const finalWeights = userWeights 
-    ? normalizeWeights(userWeights) 
+  const finalWeights = userWeights
+    ? normalizeWeights(userWeights)
     : defaultWeights;
-  
+
   // Step 1: Get interest-based matches
   const interestMatches = matchAlgorithm.findMatches(user, allUsers);
-  
+
   // Step 2: Get schedule-based matches
   const scheduleMatches = scheduleAlgorithm.findScheduleMatches(user, allUsers);
-  
+
   // Step 3: Get MBTI-based matches
   const mbtiMatches = mbtiAlgorithm.findMBTIMatches(user, allUsers);
-  
+
   // Step 4: Create lookup maps for quick access
   const interestMap = createScoreMap(interestMatches, 'matchScore');
   const scheduleMap = createScoreMap(scheduleMatches, 'scheduleScore');
   const mbtiMap = createScoreMap(mbtiMatches, 'mbtiScore');
-  
+
   // Step 5: Combine scores for all users
   const combinedMatches = allUsers
     .filter(otherUser => otherUser.id !== user.id)
@@ -67,30 +67,30 @@ exports.findBestMatches = (user, allUsers, userWeights = null) => {
       const interestScore = interestMap.get(otherUser.id) || 0;
       const scheduleScore = scheduleMap.get(otherUser.id) || 0;
       const mbtiScore = mbtiMap.get(otherUser.id) || 0;
-      
+
       // Calculate weighted combined score
-      const combinedScore = 
+      const combinedScore =
         (interestScore * finalWeights.interests) +
         (scheduleScore * finalWeights.schedule) +
         (mbtiScore * finalWeights.mbti);
-      
+
       // Get detailed match data
       const interestData = interestMatches.find(m => m.id === otherUser.id) || {};
       const scheduleData = scheduleMatches.find(m => m.id === otherUser.id) || {};
       const mbtiData = mbtiMatches.find(m => m.id === otherUser.id) || {};
-      
+
       return {
         ...otherUser,
         // Final combined score
         finalScore: Math.round(combinedScore),
-        
+
         // Individual component scores
         scores: {
           interest: Math.round(interestScore),
           schedule: Math.round(scheduleScore),
           mbti: Math.round(mbtiScore),
         },
-        
+
         // Detailed match information
         matchDetails: {
           commonInterests: interestData.commonInterests || [],
@@ -101,13 +101,13 @@ exports.findBestMatches = (user, allUsers, userWeights = null) => {
         },
       };
     })
-    
+
     // Filter out users with 0% combined score
     .filter(match => match.finalScore > 0)
-    
+
     // Sort by final combined score (highest first)
     .sort((a, b) => b.finalScore - a.finalScore);
-  
+
   return combinedMatches;
 };
 
@@ -138,17 +138,17 @@ function normalizeWeights(userWeights) {
     schedule: 0.3,
     mbti: 0.3,
   };
-  
+
   // Merge user weights with defaults
   const weights = {
     interests: userWeights.interests !== undefined ? userWeights.interests : defaultWeights.interests,
     schedule: userWeights.schedule !== undefined ? userWeights.schedule : defaultWeights.schedule,
     mbti: userWeights.mbti !== undefined ? userWeights.mbti : defaultWeights.mbti,
   };
-  
+
   // Calculate total to determine if percentages or decimals
   const total = weights.interests + weights.schedule + weights.mbti;
-  
+
   // If total is greater than 10, assume percentages (convert to decimals)
   if (total > 10) {
     return {
@@ -157,12 +157,12 @@ function normalizeWeights(userWeights) {
       mbti: weights.mbti / 100,
     };
   }
-  
+
   // If total is close to 1.0, return as is (already normalized)
   if (Math.abs(total - 1.0) < 0.01) {
     return weights;
   }
-  
+
   // Otherwise, normalize to sum to 1.0
   return {
     interests: weights.interests / total,
@@ -178,29 +178,29 @@ function normalizeWeights(userWeights) {
  * @param {Object} userWeights - Optional user-defined weights (percentages or decimals)
  * @returns {Object} - Combined compatibility score and breakdown
  */
-exports.calculateCombinedCompatibility = (user1, user2, userWeights = null) => {
+export function calculateCombinedCompatibility(user1, user2, userWeights = null) {
   const defaultWeights = {
     interests: 0.4,
     schedule: 0.3,
     mbti: 0.3,
   };
-  
+
   // Process and normalize user weights if provided
-  const finalWeights = userWeights 
-    ? normalizeWeights(userWeights) 
+  const finalWeights = userWeights
+    ? normalizeWeights(userWeights)
     : defaultWeights;
-  
+
   // Get individual compatibility scores
   const interestCompat = matchAlgorithm.calculateCompatibility(user1, user2);
   const scheduleCompat = scheduleAlgorithm.calculateScheduleCompatibility(user1, user2);
   const mbtiCompat = mbtiAlgorithm.calculateMBTICompatibility(user1, user2);
-  
+
   // Calculate weighted combined score
-  const combinedScore = 
+  const combinedScore =
     (interestCompat.score * finalWeights.interests) +
     (scheduleCompat.score * finalWeights.schedule) +
     (mbtiCompat.score * finalWeights.mbti);
-  
+
   return {
     finalScore: Math.round(combinedScore),
     breakdown: {
@@ -220,14 +220,14 @@ exports.calculateCombinedCompatibility = (user1, user2, userWeights = null) => {
  * @param {String} userPreference - User's priority ("interests", "schedule", "mbti", "balanced")
  * @returns {Object} - Weight configuration
  */
-exports.getWeightsByPreference = (userPreference) => {
+export function getWeightsByPreference(userPreference) {
   const presets = {
     interests: { interests: 0.6, schedule: 0.2, mbti: 0.2 },   // Prioritize shared interests
     schedule: { interests: 0.2, schedule: 0.6, mbti: 0.2 },    // Prioritize availability
     mbti: { interests: 0.2, schedule: 0.2, mbti: 0.6 },        // Prioritize personality
     balanced: { interests: 0.33, schedule: 0.33, mbti: 0.34 }, // Equal weight
   };
-  
+
   return presets[userPreference] || presets.balanced;
 };
 
@@ -243,7 +243,7 @@ exports.getWeightsByPreference = (userPreference) => {
  * const weights = createCustomWeights(50, 30, 20);
  * const matches = findBestMatches(user, allUsers, weights);
  */
-exports.createCustomWeights = (interestsPercent, schedulePercent, mbtiPercent) => {
+export function createCustomWeights(interestsPercent, schedulePercent, mbtiPercent) {
   return normalizeWeights({
     interests: interestsPercent,
     schedule: schedulePercent,

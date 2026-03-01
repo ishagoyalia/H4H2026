@@ -1,8 +1,8 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const matchRoutes = require('./routes/matchRoutes');
-const calendarRoutes = require('../backend/routes/calendarRoutes');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import matchRoutes from './routes/matchRoutes.js';
+import calendarRoutes from './routes/calendarRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;

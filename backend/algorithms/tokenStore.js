@@ -1,6 +1,10 @@
 // tokenStore.js - simple file-based token storage for demonstration purposes
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dataDir = path.join(__dirname, '..', 'data');
 const storePath = path.join(dataDir, 'tokens.json');
@@ -36,4 +40,4 @@ function getTokens(userId) {
   return store[userId] || null;
 }
 
-module.exports = { saveTokens, getTokens };
+export { saveTokens, getTokens };
