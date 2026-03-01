@@ -9,23 +9,23 @@
  * @param {Array} allUsers - Array of all users in the system
  * @returns {Array} - Sorted array of matches with scores
  */
-exports.findMatches = (user, allUsers) => {
+export function findMatches(user, allUsers) {
   // Step 1: Filter, Score, Sort
   const matches = allUsers
     // Remove the current user from potential matches
     .filter(otherUser => otherUser.id !== user.id)
-    
+
     // Calculate match score for each potential friend
     .map(otherUser => {
       // Find interests that both users have in common
       const commonInterests = user.interests.filter(interest =>
         otherUser.interests.includes(interest)
       );
-      
+
       // Calculate match percentage: (common interests / total user interests) * 100
       // Example: If user has 5 interests and 3 are common = 60% match
       const score = (commonInterests.length / user.interests.length) * 100;
-      
+
       // Return user data with match score and common interests
       return {
         ...otherUser,                      // Keep all original user data
@@ -33,13 +33,13 @@ exports.findMatches = (user, allUsers) => {
         commonInterests,                   // Add array of shared interests
       };
     })
-    
+
     // Step 2: Filter out users with no common interests (0% match)
     .filter(match => match.matchScore > 0)
-    
+
     // Step 3: Sort by match score (highest first)
     .sort((a, b) => b.matchScore - a.matchScore);
-  
+
   return matches;
 };
 
@@ -49,12 +49,12 @@ exports.findMatches = (user, allUsers) => {
  * @param {Object} user2 - Second user
  * @returns {Object} - Compatibility score and number of common interests
  */
-exports.calculateCompatibility = (user1, user2) => {
+export function calculateCompatibility(user1, user2) {
   // Count how many interests overlap between the two users
   const interestMatch = user1.interests.filter(interest =>
     user2.interests.includes(interest)
   ).length;
-  
+
   // Return detailed compatibility info
   return {
     score: (interestMatch / user1.interests.length) * 100,  // Percentage match
