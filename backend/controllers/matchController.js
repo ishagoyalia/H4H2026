@@ -11,40 +11,37 @@ export async function getMatches(req, res) {
     // Example: /api/matches/123?interests=50&schedule=30&mbti=20
     const { interests, schedule, mbti, preference } = req.query;
 
-    // Fetch current user profile from database
-    const user = await userService.getUserProfile(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
-    }
+    // Mock user data - replace with actual database query
+    const user = {
+      id: userId,
+      interests: ['coding', 'music'],
+      availability: [
+        { day: 'Monday', startTime: '14:00', endTime: '17:00' },
+        { day: 'Wednesday', startTime: '10:00', endTime: '12:00' },
+      ],
+      mbti: 'INFJ',
+    };
 
-    // Fetch current user's Google Calendar availability
-    try {
-      const userAvailability = await scheduleMatchService.getUserAvailability(userId);
-      user.availability = userAvailability.availability;
-    } catch (err) {
-      // User hasn't authorized calendar, use empty availability
-      console.warn(`No calendar availability for user ${userId}:`, err.message);
-      user.availability = [];
-    }
-    user.id = userId;
-
-    // Fetch all other users from database
-    let allUsers = await userService.getAllUsers();
-    allUsers = allUsers.filter(u => u.id !== userId);
-
-    // Fetch Google Calendar availability for each user
-    const enrichedUsers = await Promise.all(
-      allUsers.map(async (otherUser) => {
-        try {
-          const availability = await scheduleMatchService.getUserAvailability(otherUser.id);
-          return { ...otherUser, availability: availability.availability };
-        } catch (err) {
-          // User hasn't authorized calendar, use empty availability
-          console.warn(`No calendar availability for user ${otherUser.id}:`, err.message);
-          return { ...otherUser, availability: [] };
-        }
-      })
-    );
+    const allUsers = [
+      {
+        id: '2',
+        name: 'Alex',
+        interests: ['coding', 'gaming'],
+        availability: [
+          { day: 'Monday', startTime: '15:00', endTime: '18:00' },
+        ],
+        mbti: 'ENFP',
+      },
+      {
+        id: '3',
+        name: 'Sam',
+        interests: ['music', 'art'],
+        availability: [
+          { day: 'Wednesday', startTime: '09:00', endTime: '11:00' },
+        ],
+        mbti: 'INTJ',
+      },
+    ];
 
     let matches;
     let weights = null;

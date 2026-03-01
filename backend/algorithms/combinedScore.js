@@ -19,8 +19,8 @@
  *   const matches = findBestMatches(user, allUsers); // 40% interests, 30% schedule, 30% MBTI
  */
 
-import * as matchAlgorithm from './interestsAlgorithm.js';
-import * as scheduleAlgorithm from './gcalAlgorithm.js';
+import * as interestsAlgorithm from './interestsAlgorithm.js';
+import * as gcalAlgorithm from './gcalAlgorithm.js';
 import * as mbtiAlgorithm from './mbtiAlgorithm.js';
 
 /**
@@ -46,10 +46,10 @@ export function findBestMatches(user, allUsers, userWeights = null) {
     : defaultWeights;
 
   // Step 1: Get interest-based matches
-  const interestMatches = matchAlgorithm.findMatches(user, allUsers);
+  const interestMatches = interestsAlgorithm.findMatches(user, allUsers);
 
   // Step 2: Get schedule-based matches
-  const scheduleMatches = scheduleAlgorithm.findScheduleMatches(user, allUsers);
+  const scheduleMatches = gcalAlgorithm.findScheduleMatches(user, allUsers);
 
   // Step 3: Get MBTI-based matches
   const mbtiMatches = mbtiAlgorithm.findMBTIMatches(user, allUsers);
@@ -191,8 +191,8 @@ export function calculateCombinedCompatibility(user1, user2, userWeights = null)
     : defaultWeights;
 
   // Get individual compatibility scores
-  const interestCompat = matchAlgorithm.calculateCompatibility(user1, user2);
-  const scheduleCompat = scheduleAlgorithm.calculateScheduleCompatibility(user1, user2);
+  const interestCompat = interestsAlgorithm.calculateCompatibility(user1, user2);
+  const scheduleCompat = gcalAlgorithm.calculateScheduleCompatibility(user1, user2);
   const mbtiCompat = mbtiAlgorithm.calculateMBTICompatibility(user1, user2);
 
   // Calculate weighted combined score

@@ -13,12 +13,23 @@ export async function createOrUpdateUser(req, res) {
             });
         }
 
+        // Check if onboarding is complete (has interests and MBTI)
+        const hasInterests = profileData.interests && Array.isArray(profileData.interests) && profileData.interests.length > 0;
+        const hasMBTI = profileData.mbti && typeof profileData.mbti === 'string';
+
+        // If providing interests and MBTI, mark onboarding complete
+        if (hasInterests && hasMBTI) {
+            profileData.onboardingComplete = true;
+            profileData.updatedAt = new Date().toISOString();
+        }
+
         await userService.saveUserProfile(userId, profileData);
 
         res.json({
             success: true,
             message: 'User profile saved successfully',
-            userId
+            userId,
+            onboardingComplete: profileData.onboardingComplete || false
         });
     } catch (error) {
         res.status(500).json({

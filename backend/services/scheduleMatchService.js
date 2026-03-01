@@ -40,7 +40,7 @@ function convertEventsToAvailability(events) {
  * @returns {Object} - { userId, availability, rawEvents }
  */
 async function getUserAvailability(userId) {
-    const tokens = tokenStore.getTokens(userId);
+    const tokens = await tokenStore.getTokens(userId);
     if (!tokens) throw new Error(`No tokens stored for user ${userId}. Please authorize first.`);
 
     const now = new Date();

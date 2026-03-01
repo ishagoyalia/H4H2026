@@ -1,43 +1,63 @@
-// tokenStore.js - simple file-based token storage for demonstration purposes
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// tokenStore.js - Firebase-based token storage for Google Calendar OAuth
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dataDir = path.join(__dirname, '..', 'data');
-const storePath = path.join(dataDir, 'tokens.json');
-
-function ensureStore() {
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  if (!fs.existsSync(storePath)) fs.writeFileSync(storePath, JSON.stringify({}), 'utf8');
-}
-
-function readStore() {
-  ensureStore();
+/**
+ * Save Google Calendar OAuth tokens to user's Firestore document
+ * @param {string} userId - The user's ID
+ * @param {Object} tokens - OAuth tokens from Google (access_token, refresh_token, expiry_date, etc.)
+ */
+async function saveTokens(userId, tokens) {
   try {
-    const raw = fs.readFileSync(storePath, 'utf8');
-    return JSON.parse(raw || '{}');
-  } catch (e) {
-    return {};
+    const userRef = doc(db, 'users', userId);
+
+    // Check if user document exists
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      // Update existing document with calendar tokens
+      await updateDoc(userRef, {
+        googleCalendarTokens: tokens,
+        calendarConnected: true,
+        calendarLastUpdated: new Date().toISOString()
+      });
+    } else {
+      // Create new document with tokens
+      await setDoc(userRef, {
+        googleCalendarTokens: tokens,
+        calendarConnected: true,
+        calendarLastUpdated: new Date().toISOString()
+      });
+    }
+
+    console.log(`Saved Google Calendar tokens for user ${userId}`);
+    return true;
+  } catch (error) {
+    console.error('Error saving tokens to Firebase:', error);
+    throw error;
   }
 }
 
-function writeStore(obj) {
-  ensureStore();
-  fs.writeFileSync(storePath, JSON.stringify(obj, null, 2), 'utf8');
-}
+/**
+ * Retrieve Google Calendar OAuth tokens from user's Firestore document
+ * @param {string} userId - The user's ID
+ * @returns {Object|null} OAuth tokens or null if not found
+ */
+async function getTokens(userId) {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
 
-function saveTokens(userId, tokens) {
-  const store = readStore();
-  store[userId] = tokens;
-  writeStore(store);
-}
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      return userData.googleCalendarTokens || null;
+    }
 
-function getTokens(userId) {
-  const store = readStore();
-  return store[userId] || null;
+    return null;
+  } catch (error) {
+    console.error('Error retrieving tokens from Firebase:', error);
+    return null;
+  }
 }
 
 export { saveTokens, getTokens };
