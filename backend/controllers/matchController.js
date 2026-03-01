@@ -1,4 +1,3 @@
-import * as matchAlgorithm from '../algorithms/interestsAlgorithm.js';
 import * as combinedScore from '../algorithms/combinedScore.js';
 
 // Get matches for a user with custom weights
