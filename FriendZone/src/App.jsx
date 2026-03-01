@@ -10,14 +10,15 @@ const styles = `
   .top-nav {
     width: 100vw;          /* stretch across the screen */
     display: flex;
+    flex-direction: horizontal;
     align-items: center;   /* vertical centering of items inside */
     justify-content: center; /* horizontal centering */
     padding: 20px 0;       /* top/bottom padding only */
-    background: #ff002bff;
+    background: #eed4ffff;
   }
 
   .home-screen {
-    background: #452d08ff;
+    background: #eed4ffff;
     font-family: 'DM Sans', sans-serif;
     min-height: calc(100vh - 80px);
     display: flex;
@@ -32,23 +33,59 @@ const styles = `
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 2 columns */
     grid-template-rows: repeat(2, 150px)
-    grid-gap: 20px; /* space between boxes */
+    gap: 20px; /* space between boxes */
+    row-gap: 40px;
     width: 80%; /* optional: grid width inside home-screen */
     max-width: 600px; /* optional max width */
   }
 
-  .grid-box {
-    background: #1e0b98ff; /* any color you like */
-    border-radius: 20px; /* rounded corners */
-    height: 150px; /* box height */
+  .exploreButton {
+    background-image: linear-gradient(to bottom right, #e97439ff, #b74bd7ff);
+    border-radius: 80px; /* rounded corners */
+    height: 300px; /* box height */
+    width: 250px;
+    padding: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     font-weight: bold;
-    color: #00aaffff;
+    color: #ffffffff;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+    display: grid;
+    grid-template-columns: 1fr; 
+    grid-template-rows: 1fr 1fr; 
   }
+
+  .exploreButton:hover {
+    filter: brightness(0.7); /* Darkens the button and its contents by 30% */
+  }
+
+  .explorePopup {
+    visibility: hidden;
+    width: 500px;
+    height: 500px;
+    background-color: #eeddc2ff;
+  }
+
+  .popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
+
+  .footer {
+    height: 100px;
+  }
+
+  .profile_deets {
+    color: black;
+  }
+
+  // .fa-solid fa-circle-user {
+  //   font-size: 50px;
+  // }
 `;
 
 const CalendarIcon = ({ color = "#000", size = 20 }) => (
@@ -69,6 +106,7 @@ const ProfileIcon = () => <div>👤</div>;
 // Home page
 function App() {
   const [activeTab, setActiveTab] = useState("home");
+  const [showPopup, setShowPopup] = useState(false);
 
   const tabs = [
     { id: "home", label: "Home", Icon: HomeIcon },
@@ -80,30 +118,124 @@ function App() {
   return (
     <>
       <style>{styles}</style>
+
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/login/page" element={<LoginPage />} />
+          {/* <Route path="/user" element={<User />} /> */}
           <Route path="/" element={
             <>
+
+              <head>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></link>
+              </head>
+
               <div className="top-nav">
                 <h1>FriendZone</h1>
+                {/* <h2>User</h2> */}
               </div>
+
               <div className="home-screen">
                 <h1>Explore</h1>
+
+
                 <div className="home-grid">
-                  <div className="grid-box">Box 1</div>
-                  <div className="grid-box">Box 2</div>
-                  <div className="grid-box">Box 3</div>
-                  <div className="grid-box">Box 4</div>
+                  <button
+                    type="button"
+                    className="exploreButton"
+                    onClick={() => setShowPopup(true)}
+                  >
+                    <i class="fa-solid fa-circle-user fa-5x"></i>
+                    Profile 1
+                  </button>
+                  <button
+                    type="button"
+                    className="exploreButton"
+                    onClick={() => setShowPopup(true)}
+                  >
+                    <i class="fa-solid fa-circle-user fa-5x"></i>
+                    Profile 2
+                  </button>
+                  <button
+                    type="button"
+                    className="exploreButton"
+                    onClick={() => setShowPopup(true)}
+                  >
+                    <i class="fa-solid fa-circle-user fa-5x"></i>
+                    Profile 3
+                  </button>
+                  <button
+                    type="button"
+                    className="exploreButton"
+                    onClick={() => setShowPopup(true)}
+                  >
+                    <i class="fa-solid fa-circle-user fa-5x"></i>
+                    Profile 4
+                  </button>
                 </div>
 
+                {showPopup && (
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100vw",
+                      height: "100vh",
+                      backgroundColor: "rgba(0,0,0,0.4)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 1000,
+                    }}
+                    onClick={() => setShowPopup(false)} // click outside closes
+                  >
+                    <div
+                      style={{
+                        background: "#fff",
+                        padding: "30px",
+                        borderRadius: "12px",
+                        width: "400px",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.4)",
+                      }}
+                      onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
+                    >
+                      <div class="profile_deets">
+                        <h2>Name: ___________</h2>
+                        <h3>Bio: _____________</h3>
+                        <p>Times You're Both Available:</p>
+                        <p>Mon: 3 - 5 pm</p>
+                        <p>Wed: 6 - 7 pm</p>
+                        <p>Sat: 8 - 12 am</p>
+                      </div>
+
+                      <button
+                        onClick={() => setShowPopup(false)}
+                        style={{
+                          marginTop: "20px",
+                          padding: "10px 20px",
+                          borderRadius: "8px",
+                          border: "none",
+                          background: "#e97439",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+
               </div>
+
             </>
 
           } />
         </Routes>
       </BrowserRouter>
+
     </>
   );
 }

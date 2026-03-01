@@ -121,40 +121,20 @@ async function compareSchedules(userId1, userId2) {
  * @param {Array} otherUserIds - Array of other user IDs to compare
  * @returns {Object} - Matches sorted by score
  */
+
+
+// Optimized version of findScheduleMatches in scheduleMatchService.js
 async function findScheduleMatches(userId, otherUserIds) {
-    try {
-        const userAvailability = await getUserAvailability(userId);
-        const user = {
-            id: userId,
-            ...userAvailability,
-        };
+    const userAvailability = await getUserAvailability(userId); // Fetch current user ONCE
 
-        // Compare with each other user
-        const matches = [];
-        for (const otherId of otherUserIds) {
-            try {
-                const result = await compareSchedules(userId, otherId);
-                if (result.matchScore > 0) {
-                    matches.push(result);
-                }
-            } catch (err) {
-                // Skip users with no tokens or auth errors
-                console.error(`Could not compare ${userId} with ${otherId}:`, err.message);
-            }
-        }
+    // Fetch all others in parallel
+    const matchPromises = otherUserIds.map(otherId => compareSchedules(userId, otherId, userAvailability));
+    const results = await Promise.allSettled(matchPromises);
 
-        // Sort by match score (highest first)
-        matches.sort((a, b) => b.matchScore - a.matchScore);
-
-        return {
-            success: true,
-            userId,
-            totalMatches: matches.length,
-            matches,
-        };
-    } catch (error) {
-        throw new Error(`Finding schedule matches failed: ${error.message}`);
-    }
+    return results
+        .filter(r => r.status === 'fulfilled' && r.value.matchScore > 0)
+        .map(r => r.value)
+        .sort((a, b) => b.matchScore - a.matchScore);
 }
 
 export {
