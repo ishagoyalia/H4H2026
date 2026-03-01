@@ -487,14 +487,40 @@ function Explore({ showPopup, setShowPopup }) {
                 </div>
               )}
 
+              {/* Show overlapping times if available */}
               {selectedUser.matchDetails?.overlappingSlots?.length > 0 && (
                 <div style={{ marginTop: "15px" }}>
                   <p><strong>Times You're Both Available:</strong></p>
-                  {selectedUser.matchDetails.overlappingSlots.slice(0, 5).map((slot, idx) => (
-                    <p key={idx} style={{ fontSize: "14px" }}>
-                      {slot.day}: {slot.start} - {slot.end}
-                    </p>
-                  ))}
+                  {selectedUser.matchDetails.overlappingSlots.slice(0, 5).map((slot, idx) => {
+                    // Format the day nicely (convert ISO date to readable format)
+                    let displayDay = slot.day;
+                    try {
+                      const date = new Date(slot.day);
+                      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                      displayDay = `${dayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`;
+                    } catch (e) {
+                      // If date parsing fails, use original day value
+                    }
+
+                    return (
+                      <p key={idx} style={{ fontSize: "14px" }}>
+                        {displayDay}: {slot.startTime} - {slot.endTime}
+                      </p>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Show message if no calendar connected */}
+              {(!selectedUser.matchDetails?.overlappingSlots || selectedUser.matchDetails.overlappingSlots.length === 0) && (
+                <div style={{ marginTop: "15px" }}>
+                  <p><strong>Times You're Both Available:</strong></p>
+                  <p style={{ fontSize: "14px", color: "#999" }}>
+                    {selectedUser.scores?.schedule === 0
+                      ? "Connect your Google Calendars to see overlapping free time!"
+                      : "No overlapping times found"}
+                  </p>
                 </div>
               )}
 
