@@ -124,11 +124,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/login/page" element={<LoginPage />} />
-<<<<<<< HEAD
           <Route path="/signup" element={<Signup />} />
-=======
           {/* <Route path="/user" element={<User />} /> */}
->>>>>>> 9f282b8b0966fa42e5ffe92882b3d260b8d0a225
           <Route path="/" element={
             <>
 
