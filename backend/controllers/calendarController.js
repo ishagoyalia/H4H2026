@@ -1,7 +1,7 @@
 // calendarController.js - handles routes for calendar integration (OAuth and events)
 import * as googleCalendar from '../algorithms/googleCalendar.js';
 import * as tokenStore from '../algorithms/tokenStore.js';
-import * as userService from '../services/userService.js'; // To update user profile with calendar info
+import * as userService from '../userService.js'; // To update user profile with calendar info
 import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js'; // To calculate free slots from events
 
 // Return an auth URL to start OAuth flow
