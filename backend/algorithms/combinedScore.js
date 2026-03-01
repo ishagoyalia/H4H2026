@@ -33,11 +33,11 @@ import * as mbtiAlgorithm from './mbtiAlgorithm.js';
  * @returns {Array} - Ranked matches with combined scores
  */
 export function findBestMatches(user, allUsers, userWeights = null) {
-  // Default weights (must add up to 1.0)
+  // Default weights (must add up to 1.0) - Equal weight for all factors
   const defaultWeights = {
-    interests: 0.4,    // 40% weight on shared interests
-    schedule: 0.3,     // 30% weight on schedule overlap
-    mbti: 0.3,         // 30% weight on personality compatibility
+    interests: 0.333,  // 33.3% weight on shared interests
+    schedule: 0.333,   // 33.3% weight on schedule overlap
+    mbti: 0.334,       // 33.4% weight on personality compatibility (adds to 1.0)
   };
 
   // Process and normalize user weights if provided
