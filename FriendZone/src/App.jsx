@@ -256,10 +256,11 @@
 
 
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Login from "./login.jsx";
 import LoginPage from "./components/loginpage.jsx";
 import Signup from "./components/signup.jsx";
+import { api } from "./services/api.js";
 
 const styles = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -395,37 +396,112 @@ function Home() {
 }
 
 function Explore({ showPopup, setShowPopup }) {
-  return (
+  const [matches, setMatches] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchMatches = async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.warn('No userId found in localStorage');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.getMatches(userId);
+        setMatches(response.matches || []);
+      } catch (error) {
+        console.error('Failed to fetch matches:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMatches();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="home-screen">
+        <h1 style={{ color: "#e97439" }}>Explore</h1>
+        <p style={{ color: "white", fontSize: "18px" }}>Loading matches...</p>
+      </div>
+    );
+  }
+
+  return (
     <div className="home-screen">
       <h1 style={{ color: "#e97439" }}>Explore</h1>
 
-      <div className="home-grid" style={{ color: "white" }}>
-        {[1, 2, 3, 4].map((n) => (
-          <button
-            key={n}
-            className="exploreButton"
-            onClick={() => setShowPopup(true)}
-          >
-            <i className="fa-solid fa-circle-user fa-5x"></i>
-            Profile {n}
-          </button>
-        ))}
-      </div>
+      {matches.length === 0 ? (
+        <p style={{ color: "white", fontSize: "18px" }}>No matches found. Complete your profile to find compatible friends!</p>
+      ) : (
+        <div className="home-grid" style={{ color: "white" }}>
+          {matches.map((match) => (
+            <button
+              key={match.id}
+              className="exploreButton"
+              onClick={() => {
+                setSelectedUser(match);
+                setShowPopup(true);
+              }}
+            >
+              <i className="fa-solid fa-circle-user fa-5x"></i>
+              <div>{match.name || 'Anonymous'}</div>
+              <div style={{ fontSize: "14px", marginTop: "8px" }}>
+                Compatibility: {match.finalScore || 0}%
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {
-        showPopup && (
-          <div style={overlayStyle} onClick={() => setShowPopup(false)}>
+        showPopup && selectedUser && (
+          <div style={overlayStyle} onClick={() => {
+            setShowPopup(false);
+            setSelectedUser(null);
+          }}>
             <div style={{ ...popupStyle, color: "black" }} onClick={(e) => e.stopPropagation()}>
-              <h2>Name: ___________</h2>
-              <h3>Bio: _____________</h3>
-              <p>Times You're Both Available:</p>
-              <p>Mon: 3 - 5 pm</p>
-              <p>Wed: 6 - 7 pm</p>
-              <p>Sat: 8 - 12 am</p>
+              <h2>Name: {selectedUser.name || 'Anonymous'}</h2>
+              <h3>Email: {selectedUser.email || 'N/A'}</h3>
+              <p><strong>Bio:</strong> {selectedUser.bio || 'No bio provided'}</p>
+              <p><strong>MBTI:</strong> {selectedUser.mbti || 'N/A'}</p>
+
+              <div style={{ marginTop: "15px" }}>
+                <p><strong>Compatibility Score: {selectedUser.finalScore}%</strong></p>
+                <p style={{ fontSize: "14px", marginTop: "5px" }}>
+                  • Interests: {selectedUser.scores?.interest || 0}%<br />
+                  • Schedule: {selectedUser.scores?.schedule || 0}%<br />
+                  • MBTI: {selectedUser.scores?.mbti || 0}%
+                </p>
+              </div>
+
+              {selectedUser.matchDetails?.commonInterests?.length > 0 && (
+                <div style={{ marginTop: "15px" }}>
+                  <p><strong>Common Interests:</strong></p>
+                  <p>{selectedUser.matchDetails.commonInterests.join(', ')}</p>
+                </div>
+              )}
+
+              {selectedUser.matchDetails?.overlappingSlots?.length > 0 && (
+                <div style={{ marginTop: "15px" }}>
+                  <p><strong>Times You're Both Available:</strong></p>
+                  {selectedUser.matchDetails.overlappingSlots.slice(0, 5).map((slot, idx) => (
+                    <p key={idx} style={{ fontSize: "14px" }}>
+                      {slot.day}: {slot.start} - {slot.end}
+                    </p>
+                  ))}
+                </div>
+              )}
 
               <button
-                onClick={() => setShowPopup(false)}
+                onClick={() => {
+                  setShowPopup(false);
+                  setSelectedUser(null);
+                }}
                 style={{
                   marginTop: "20px",
                   padding: "10px 20px",
@@ -442,7 +518,7 @@ function Explore({ showPopup, setShowPopup }) {
           </div>
         )
       }
-    </div >
+    </div>
   );
 }
 
