@@ -51,6 +51,26 @@ const styles = `
     color: var(--brown-dark);
     letter-spacing: 0.3px;
   }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .stat {
+    background: var(--card-bg);
+    vorder: 1px solid var(--border);
+    border-radius: 50px;
+    padding; 10px 20px;
+    display: flex;
+    align-items: cetner;
+    gap: 7px;
+  }
+
+  .stat-offline
+  
+  .stat-online
+  .stat-text
 `
 
 const CalendarIcon = ({ color="#fff", size=20 }) => {
@@ -68,18 +88,33 @@ const CalendarIcon = ({ color="#fff", size=20 }) => {
 function App() {
   const [activeTab, setActiveTab] = useState("home");
 
-  const tabs = [
-    { id: "home", label: "Home", Icon: HomeIcon },
-    { id: "calendar", label: "Calendar", Icon: CalIcon },
-    { id: "matches", label: "Matches", Icon: MatchIcon },
-    { id: "profile", label: "Profile", Icon: ProfileIcon },
-  ];
-
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<h1>yay</h1>} />
+        <Route path="/" element={
+          <>
+            <style>{styles}</style>
+            <div className="home-screen">
+              <div className="top-nav">
+                <div className="nav-icon"><CalendarIcon size={18} /></div>
+                <span className="nav-title">FriendZone</span>
+              </div>
+              
+              <div className="stats-row">
+                <div className="stat">
+                  <div className="stat-online" />
+                  <span className="stat-text">3 friends online</span>
+                </div>
+                <div classname="stat">
+                  <div className="stat-total" />
+                  <span calssname="stat-text">6 friends total</span>
+                </div>
+              </div>
+            </div>
+
+          </>
+        } />
       </Routes>
     </BrowserRouter>
 
