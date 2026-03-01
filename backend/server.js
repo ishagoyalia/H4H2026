@@ -11,10 +11,16 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://friendzone-417c2.firebaseapp.com', 'https://friendzone-417c2.web.app'],
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://friendzone-417c2.firebaseapp.com', 'https://friendzone-417c2.web.app'],
   credentials: true
 }));
 app.use(express.json());
+
+// 2. Added a Logger: This will print every request to your terminal so you know it's working
+app.use((req, res, next) => {
+  console.log(`${new Date().toLocaleTimeString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -28,6 +34,9 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`BACKEND IS LIVE`);
+  console.log(`Local:            http://localhost:${PORT}`);
+  console.log(`Network (IPv4):   http://127.0.0.1:${PORT}`);
+  console.log(`Health Check:     http://127.0.0.1:${PORT}/health`);
 });
