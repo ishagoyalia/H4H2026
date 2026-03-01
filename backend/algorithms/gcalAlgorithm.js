@@ -30,8 +30,8 @@ export function findScheduleMatches(user, allUsers) {
       );
 
       // Score: More overlapping hours = higher score (max 100)
-      // Assuming 20+ hours overlap = perfect match
-      const scheduleScore = Math.min((totalOverlapHours / 20) * 100, 100);
+      // Assuming 5+ hours overlap = perfect match
+      const scheduleScore = Math.min((totalOverlapHours / 5) * 100, 100);
 
       return {
         ...otherUser,
@@ -162,4 +162,54 @@ export function calculateScheduleCompatibility(user1, user2) {
     overlappingSlots,
     totalOverlapHours,
   };
-};
+}
+
+/**
+ * Converts busy blocks (from Google) into free time slots based on a 
+ * standard window (e.g., 9 AM to 5 PM).
+ * @param {Array} busyBlocks - The raw events from Google Calendar
+ * @param {Object} baseWindow - {start: "09:00", end: "17:00"}
+ */
+export function calculateFreeSlots(busyBlocks, baseWindow = { start: "09:00", end: "21:00" }) {
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  let allFreeSlots = [];
+
+  days.forEach(day => {
+    // 1. Get busy blocks for this specific day and sort them by time
+    const dayBusy = (busyBlocks || [])
+      .filter(b => b.day === day)
+      .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+
+    let currentTime = timeToMinutes(baseWindow.start);
+    const endTimeLimit = timeToMinutes(baseWindow.end);
+
+    dayBusy.forEach(block => {
+      const blockStart = timeToMinutes(block.startTime);
+      const blockEnd = timeToMinutes(block.endTime);
+
+      // If there is a gap between now and the next meeting, that's FREE TIME
+      if (blockStart > currentTime) {
+        allFreeSlots.push({
+          day,
+          startTime: minutesToTime(currentTime),
+          endTime: minutesToTime(blockStart),
+          duration: (blockStart - currentTime) / 60
+        });
+      }
+      // Move pointer to the end of the meeting (handle overlapping meetings)
+      currentTime = Math.max(currentTime, blockEnd);
+    });
+
+    // Final gap: From the end of the last meeting to the end of the day
+    if (currentTime < endTimeLimit) {
+      allFreeSlots.push({
+        day,
+        startTime: minutesToTime(currentTime),
+        endTime: minutesToTime(endTimeLimit),
+        duration: (endTimeLimit - currentTime) / 60
+      });
+    }
+  });
+
+  return allFreeSlots;
+}
