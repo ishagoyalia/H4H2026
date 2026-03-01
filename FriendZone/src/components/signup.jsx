@@ -108,7 +108,7 @@ export default function signup() {
                     </>
                 )}
             </select>
-            <Link to="/"><button type="Submit" onClick={handleSubmit}> Sign up </button></Link>
+            <Link to="/"><button type="Submit" onClick={handleSubmit}> Submit </button></Link>
         </div>
     )
 }
