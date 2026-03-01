@@ -1,7 +1,9 @@
 // API service for making requests to the backend
 // Firebase authentication functions for Google Sign-In
 
-// if you wanna use this in front end import { api } from '../services/api'; and then 
+//**HOW TO USE THIS FILE IN FRONT END-->>
+
+// if you wanna use this in front end import { api } from '../services/api.js'; and then 
 // call api.loginWithGoogle() to trigger the Google Sign-In flow. This will return an object with 
 // user info and tokens that you can use to authenticate with your backend and access Google Calendar data.
 
