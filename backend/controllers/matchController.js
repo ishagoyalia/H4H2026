@@ -1,6 +1,7 @@
 import * as combinedScore from '../algorithms/combinedScore.js';
 import * as userService from '../userService.js';
 import * as scheduleMatchService from '../services/scheduleMatchService.js';
+import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js';
 
 // Get matches for a user with custom weights
 export async function getMatches(req, res) {
@@ -30,7 +31,7 @@ export async function getMatches(req, res) {
     // Fetch Google Calendar availability if user has it connected
     try {
       const calendarData = await scheduleMatchService.getUserAvailability(userId);
-      user.availability = calendarData.availability;
+      user.availability = gcalAlgorithm.calculateFreeSlots(calendarData.availability);
     } catch (error) {
       // User doesn't have Google Calendar connected or no tokens
       // Use manual availability from profile or empty array
@@ -45,7 +46,7 @@ export async function getMatches(req, res) {
     for (const otherUser of allUsers) {
       try {
         const calendarData = await scheduleMatchService.getUserAvailability(otherUser.id);
-        otherUser.availability = calendarData.availability;
+        otherUser.availability = gcalAlgorithm.calculateFreeSlots(calendarData.availability);
       } catch (error) {
         // User doesn't have Google Calendar - use manual availability
         otherUser.availability = otherUser.availability || [];
