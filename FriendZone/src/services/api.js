@@ -6,6 +6,7 @@
 // if you wanna use this in front end import { api } from '../services/api.js'; and then 
 // call api.loginWithGoogle() to trigger the Google Sign-In flow. This will return an object with 
 // user info and tokens that you can use to authenticate with your backend and access Google Calendar data.
+import { auth } from '../../../backend/firebase.js'; // Firebase auth instance (configured in firebase.js)
 
 import {
     signInWithPopup,  // Opens a popup for user to sign in with Google
@@ -13,7 +14,6 @@ import {
     onAuthStateChanged,  // Listens to auth state changes
     signOut  // Signs out the current user
 } from 'firebase/auth';
-import { auth } from '../../../backend/firebase'; // Firebase auth instance (configured in firebase.js)
 
 const API_BASE_URL = 'http://localhost:5000/api';
 

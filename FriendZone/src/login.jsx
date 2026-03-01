@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
-import LoginPage from "./components/loginpage.jsx"
+//import Login from "./components/loginpage.jsx"
 import Signup from "./components/signup.jsx"
 //@5:53, edited login.jsx to handle pop up google login EDITED
 import React, { useState } from "react"
