@@ -10,7 +10,7 @@ export default function signup() {
     const handleHobbiesChange = e => setHobbies(e.target.value)
     const [MBTI, setMBTI] = useState("")
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         //console.log('Selected hobby:', hobbies, 'MBTI:', MBTI);
 
