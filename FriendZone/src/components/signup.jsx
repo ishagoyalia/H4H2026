@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
+import { api } from "../services/api.js"  // Import the api service
 
 // Weight mappings for combinedScore calculation
 
@@ -32,21 +33,38 @@ export default function signup() {
 
     const handleSubmit = async () => {
         // Get weights for selected options
-        const roleWeight = roleWeights[role] || 0;
         const hobbyWeight = hobbyWeights[hobbies] || 0;
 
         // Combine weights for combinedScore
         const weights = {
-            role,
             hobbies,
-            roleWeight,
             hobbyWeight,
-            combinedWeightScore: (roleWeight + hobbyWeight) / 2 // Average of both weights
         };
 
         console.log('Weights for combinedScore:', weights);
-        // You can send this data to your backend API here
-        // Example: await api.updateProfile(userId, { weights });
+        // Resolve userId: prefer locally stored id (set at login), then prefer Google provider ID, fallback to Firebase user UID
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            try {
+                const current = await api.getCurrentUser();
+                if (current) {
+                    // If user signed in with Google, the Google account id is usually in providerData
+                    if (Array.isArray(current.providerData)) {
+                        const googleProvider = current.providerData.find(p => p.providerId === 'google.com');
+                        if (googleProvider && googleProvider.uid) {
+                            userId = googleProvider.uid; // Google user ID (preferred)
+                        }
+                    }
+                    // Fallback to Firebase uid when Google provider id isn't available
+                    if (!userId && current.uid) userId = current.uid;
+                }
+            } catch (err) {
+                console.error('Error fetching current user:', err);
+            }
+        }
+
+        // Send weights to backend for the authenticated user
+        await api.updateProfile(userId, { weights });
     }
     return (
         <div>
@@ -90,7 +108,7 @@ export default function signup() {
                     </>
                 )}
             </select>
-            <button onClick={handleSubmit}>Submit</button>
+            <Link to="/"><button type="Submit"> Login</button></Link>
         </div>
     )
 }
