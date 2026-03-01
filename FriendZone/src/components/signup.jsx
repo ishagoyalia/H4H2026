@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 import { api } from "../services/api.js"  // Import the api service
-import { generateAuthUrl } from "../services/googleCalendar.js";
 
 export default function signup() {
     const [role, setRole] = useState(''); // default value
@@ -10,9 +9,9 @@ export default function signup() {
     const handleHobbiesChange = e => setHobbies(e.target.value)
     const [MBTI, setMBTI] = useState("")
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        //console.log('Selected hobby:', hobbies, 'MBTI:', MBTI);
+
+    const handleSubmit = async () => {
+        console.log('Selected hobby:', hobbies, 'MBTI:', MBTI);
 
         // Resolve userId: prefer locally stored id (set at login), then prefer Google provider ID, fallback to Firebase user UID
         let userId = localStorage.getItem('userId');
@@ -35,40 +34,11 @@ export default function signup() {
             }
         }
 
-        if (!userId) {
-            alert("User ID not found. Please log in again.");
-            return;
-        }
-
-        // If you save ["sports", "basketball"], you WILL match with them on "sports".
-        const profileData = {
-            interests: [role, hobbies].filter(Boolean),
-            mbti: MBTI.toUpperCase().trim(),
-            calendarConnected: false
-        };
-
-        try {
-            // Save the profile to your database
-            await api.updateProfile(userId, profileData);
-
-            // 3. REAL FIX FOR CALENDAR: Redirect to Google for Permissions
-            // This pulls the URL from your googleCalendar.js generateAuthUrl()
-            const authUrl = generateAuthUrl();
-
-            // Redirect the user to the Google Consent Screen
-            window.location.href = authUrl;
-
-        } catch (err) {
-            console.error('Signup update failed:', err);
-            alert("There was an error saving your profile.");
-        }
-
-        /*
         // Save interest and MBTI for matching algorithm
         await api.updateProfile(userId, {
             interests: [hobbies],
             mbti: MBTI.toUpperCase()  // Ensure uppercase (ENFP not enfp)
-        });*/
+        });
     }
     return (
         <div>
@@ -120,10 +90,7 @@ export default function signup() {
                 onChange={(e) => setMBTI(e.target.value)}
                 required
             />
-
             <Link to="/"><button type="Submit" onClick={handleSubmit}> Submit </button></Link>
-            <p> </p>
-            <Link to="https://www.16personalities.com/free-personality-test" target="_blank">If you don't know your MBTI type, click here to find out!</Link>
         </div>
     )
 }
