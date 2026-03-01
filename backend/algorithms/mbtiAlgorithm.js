@@ -36,7 +36,7 @@ export function findMBTIMatches(user, allUsers) {
 
     // Calculate MBTI compatibility for each user
     .map(otherUser => {
-      const compatibilityResult = calculateMBTICompatibility(
+      const compatibilityResult = calculateMBTIperfectPair(
         user.mbti,
         otherUser.mbti
       );
@@ -61,7 +61,7 @@ export function findMBTIMatches(user, allUsers) {
  * @param {String} mbti2 - Second user's MBTI type (e.g., "ENFP")
  * @returns {Object} - Compatibility score and details
  */
-function calculateMBTICompatibility(mbti1, mbti2) {
+function calculateMBTIperfectPair(mbti1, mbti2) {
   // Step 1: Check if this is a perfect pair
   const isPerfectPair = checkPerfectPair(mbti1, mbti2);
 
@@ -164,6 +164,7 @@ function calculateLetterCompatibility(mbti1, mbti2) {
  * @returns {Object} - Compatibility score and details
  */
 export function calculateMBTICompatibility(user1, user2) {
+
   if (!user1.mbti || !user2.mbti) {
     return {
       score: 0,
@@ -171,7 +172,7 @@ export function calculateMBTICompatibility(user1, user2) {
     };
   }
 
-  return calculateMBTICompatibility(user1.mbti, user2.mbti);
+  return calculateMBTIperfectPair(user1.mbti, user2.mbti);
 };
 
 /**
