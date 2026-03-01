@@ -26,15 +26,30 @@ const interests = [
 ];
 
 
+const mbtiWeights = 1; // Placeholder for MBTI weights if needed in the future
+
 export default function signup() {
     const [role, setRole] = useState(''); // default value
     const [hobbies, setHobbies] = useState('');
     const handleRoleChange = e => setRole(e.target.value)
     const handleHobbiesChange = e => setHobbies(e.target.value)
+    const [MBTI, setMBTI] = useState("")
+
 
     const handleSubmit = async () => {
-        console.log('Selected hobby:', hobbies);
+        // Get weights for selected options
+        const hobbyWeight = hobbyWeights[hobbies] || 0;
+        const mbtiWeight = mbtiWeights; // Currently a constant, can be expanded to vary by MBTI type if desired
 
+        // Combine weights for combinedScore
+        const weights = {
+            hobbies,
+            hobbyWeight,
+            MBTI,
+            mbtiWeight,
+        };
+
+        console.log('Weights for hobbies:', weights);
         // Resolve userId: prefer locally stored id (set at login), then prefer Google provider ID, fallback to Firebase user UID
         let userId = localStorage.getItem('userId');
         if (!userId) {
@@ -101,6 +116,14 @@ export default function signup() {
                     </>
                 )}
             </select>
+
+            <input //The MBTI inputs 
+                type="MBTI"
+                placeholder="Enter your MBTI type"
+                value={MBTI}
+                onChange={(e) => setMBTI(e.target.value)}
+                required
+            />
             <Link to="/"><button type="Submit" onClick={handleSubmit}> Submit </button></Link>
         </div>
     )
