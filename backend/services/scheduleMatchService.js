@@ -3,9 +3,9 @@
  * Orchestrates fetching Google Calendar events and calculating schedule compatibility
  */
 
-const googleCalendar = require('../algorithms/googleCalendar');
-const gcalAlgorithm = require('../algorithms/gcalAlgorithm');
-const tokenStore = require('../algorithms/tokenStore');
+import * as googleCalendar from '../algorithms/googleCalendar.js';
+import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js';
+import * as tokenStore from '../algorithms/tokenStore.js';
 
 /**
  * Convert Google Calendar events to availability slots compatible with algorithm
@@ -157,7 +157,7 @@ async function findScheduleMatches(userId, otherUserIds) {
     }
 }
 
-module.exports = {
+export {
     getUserAvailability,
     compareSchedules,
     findScheduleMatches,

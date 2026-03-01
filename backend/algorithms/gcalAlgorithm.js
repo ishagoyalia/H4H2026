@@ -9,12 +9,12 @@
  * @param {Array} allUsers - Array of all users in the system
  * @returns {Array} - Users with schedule overlap scores
  */
-exports.findScheduleMatches = (user, allUsers) => {
+export function findScheduleMatches(user, allUsers) {
   // Calculate schedule compatibility for each user
   const scheduleMatches = allUsers
     // Remove the current user
     .filter(otherUser => otherUser.id !== user.id)
-    
+
     // Calculate time overlap for each potential match
     .map(otherUser => {
       // Find overlapping free time slots
@@ -22,17 +22,17 @@ exports.findScheduleMatches = (user, allUsers) => {
         user.availability || [],
         otherUser.availability || []
       );
-      
+
       // Calculate match score based on number of overlapping hours
       const totalOverlapHours = overlappingSlots.reduce(
         (sum, slot) => sum + slot.duration,
         0
       );
-      
+
       // Score: More overlapping hours = higher score (max 100)
       // Assuming 20+ hours overlap = perfect match
       const scheduleScore = Math.min((totalOverlapHours / 20) * 100, 100);
-      
+
       return {
         ...otherUser,
         scheduleScore: Math.round(scheduleScore),
@@ -40,13 +40,13 @@ exports.findScheduleMatches = (user, allUsers) => {
         totalOverlapHours,              // Total hours available together
       };
     })
-    
+
     // Filter out users with no overlapping time (0% match)
     .filter(match => match.scheduleScore > 0)
-    
+
     // Sort by schedule compatibility (most overlap first)
     .sort((a, b) => b.scheduleScore - a.scheduleScore);
-  
+
   return scheduleMatches;
 };
 
@@ -58,7 +58,7 @@ exports.findScheduleMatches = (user, allUsers) => {
  */
 function findOverlappingTimeSlots(userAvailability, otherAvailability) {
   const overlaps = [];
-  
+
   // Compare each of user's availability slots with other user's slots
   userAvailability.forEach(userSlot => {
     otherAvailability.forEach(otherSlot => {
@@ -70,7 +70,7 @@ function findOverlappingTimeSlots(userAvailability, otherAvailability) {
       }
     });
   });
-  
+
   return overlaps;
 }
 
@@ -83,13 +83,13 @@ function findOverlappingTimeSlots(userAvailability, otherAvailability) {
 function timeSlotsOverlap(slot1, slot2) {
   // Must be the same day
   if (slot1.day !== slot2.day) return false;
-  
+
   // Convert times to minutes for easier comparison
   const start1 = timeToMinutes(slot1.startTime);
   const end1 = timeToMinutes(slot1.endTime);
   const start2 = timeToMinutes(slot2.startTime);
   const end2 = timeToMinutes(slot2.endTime);
-  
+
   // Check if time ranges overlap
   return start1 < end2 && start2 < end1;
 }
@@ -105,12 +105,12 @@ function calculateOverlap(slot1, slot2) {
   const end1 = timeToMinutes(slot1.endTime);
   const start2 = timeToMinutes(slot2.startTime);
   const end2 = timeToMinutes(slot2.endTime);
-  
+
   // Find the overlapping period
   const overlapStart = Math.max(start1, start2);
   const overlapEnd = Math.min(end1, end2);
   const durationMinutes = overlapEnd - overlapStart;
-  
+
   return {
     day: slot1.day,
     startTime: minutesToTime(overlapStart),
@@ -146,17 +146,17 @@ function minutesToTime(minutes) {
  * @param {Object} user2 - Second user
  * @returns {Object} - Schedule compatibility score and details
  */
-exports.calculateScheduleCompatibility = (user1, user2) => {
+export function calculateScheduleCompatibility(user1, user2) {
   const overlappingSlots = findOverlappingTimeSlots(
     user1.availability || [],
     user2.availability || []
   );
-  
+
   const totalOverlapHours = overlappingSlots.reduce(
     (sum, slot) => sum + slot.duration,
     0
   );
-  
+
   return {
     score: Math.min((totalOverlapHours / 20) * 100, 100),
     overlappingSlots,

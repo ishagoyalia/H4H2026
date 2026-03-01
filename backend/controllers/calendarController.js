@@ -1,9 +1,9 @@
 // calendarController.js - handles routes for calendar integration (OAuth and events)
-const googleCalendar = require('../algorithms/googleCalendar');
-const tokenStore = require('../algorithms/tokenStore');
+import * as googleCalendar from '../algorithms/googleCalendar.js';
+import * as tokenStore from '../algorithms/tokenStore.js';
 
 // Return an auth URL to start OAuth flow
-exports.getAuthUrl = (req, res) => {
+export function getAuthUrl(req, res) {
   try {
     const url = googleCalendar.generateAuthUrl();
     res.json({ success: true, url });
@@ -13,7 +13,7 @@ exports.getAuthUrl = (req, res) => {
 };
 
 // Callback to exchange code and save tokens for a user
-exports.oauthCallback = async (req, res) => {
+export async function oauthCallback(req, res) {
   try {
     const code = req.query.code;
     const userId = req.query.state || req.query.userId || 'test-user';
@@ -29,7 +29,7 @@ exports.oauthCallback = async (req, res) => {
 };
 
 // Get upcoming events for a saved user LISTEVENTS OR CALENDAR.FREEBUSY
-exports.getEvents = async (req, res) => {
+export async function getEvents(req, res) {
   try {
     const { userId } = req.params;
     const tokens = tokenStore.getTokens(userId);
