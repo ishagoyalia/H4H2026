@@ -23,8 +23,15 @@ export function getAuthUrl(req, res) {
 export async function oauthCallback(req, res) {
   try {
     const code = req.query.code;
-    const userId = req.query.state || req.query.userId || 'test-user';
-    if (!code) return res.status(400).json({ success: false, error: 'Missing code' });
+    const userId = req.query.state; // Get userId from OAuth state parameter
+
+    if (!code) {
+      return res.status(400).json({ success: false, error: 'Missing authorization code' });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Missing userId - please connect from Profile page' });
+    }
 
     const tokens = await googleCalendar.getTokensFromCode(code);
 
