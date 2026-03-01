@@ -1,7 +1,6 @@
 import * as combinedScore from '../algorithms/combinedScore.js';
 import * as userService from '../userService.js';
 import * as scheduleMatchService from '../services/scheduleMatchService.js';
-import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js';
 
 // Get matches for a user with custom weights
 export async function getMatches(req, res) {
@@ -31,7 +30,7 @@ export async function getMatches(req, res) {
     // Fetch Google Calendar availability if user has it connected
     try {
       const calendarData = await scheduleMatchService.getUserAvailability(userId);
-      user.availability = gcalAlgorithm.calculateFreeSlots(calendarData.availability);
+      user.availability = calendarData.availability;
     } catch (error) {
       // User doesn't have Google Calendar connected or no tokens
       // Use manual availability from profile or empty array
@@ -43,14 +42,23 @@ export async function getMatches(req, res) {
     const allUsers = await userService.getAllUsers();
 
     // Fetch Google Calendar availability for each user if available
-    for (const otherUser of allUsers) {
-      try {
-        const calendarData = await scheduleMatchService.getUserAvailability(otherUser.id);
-        otherUser.availability = gcalAlgorithm.calculateFreeSlots(calendarData.availability);
-      } catch (error) {
-        // User doesn't have Google Calendar - use manual availability
-        otherUser.availability = otherUser.availability || [];
-      }
+    function convertEventsToAvailability(events) {
+      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      return events.map((event) => {
+        const startDate = new Date(event.start.dateTime || event.start.date);
+        const endDate = new Date(event.end.dateTime || event.end.date);
+
+        // FIX: Match the "Monday", "Tuesday" format expected by gcalAlgorithm
+        const dayName = days[startDate.getDay()];
+
+        return {
+          date: startDate.toISOString().split('T')[0],
+          day: dayName, // Now gcalAlgorithm.timeSlotsOverlap will work!
+          startTime: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`,
+          endTime: `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`,
+        };
+      })
     }
 
     let matches;
