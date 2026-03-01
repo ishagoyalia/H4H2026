@@ -156,6 +156,20 @@ export const api = {
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const idToken = await user.getIdToken();
 
+            // --- NEW: SEND DATA TO BACKEND ---
+            // This registers the user and saves their calendar tokens
+            await fetch(`${API_BASE_URL}/users`, { // Or your /users/login route
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.uid,
+                    email: user.email,
+                    name: user.displayName,
+                    tokens: credential // This includes the access_token for the calendar
+                }),
+            });
+            // ---------------------------------
+
             return {
                 success: true,
                 userId: user.uid,
@@ -165,6 +179,7 @@ export const api = {
                 credential,
             };
         } catch (error) {
+            console.error("Login fetch error:", error);
             return { success: false, error: error.message };
         }
     },
