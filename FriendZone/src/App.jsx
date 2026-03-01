@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import Login from "./login.jsx";
 import LoginPage from "./components/loginpage.jsx";
+import Signup from "./components/signup.jsx";
 
 const styles = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,6 +85,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/login/page" element={<LoginPage />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/" element={
             <>
               <div className="top-nav">

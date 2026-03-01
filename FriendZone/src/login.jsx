@@ -20,13 +20,23 @@ export default function Login() {
             const result = await api.loginWithGoogle()
 
             if (result.success) {
-                // Login successful - store user info and redirect
+                // Login successful - store user info
                 localStorage.setItem('userId', result.userId)
                 localStorage.setItem('userEmail', result.email)
                 localStorage.setItem('userName', result.name)
 
                 console.log('Logged in as:', result.email)
-                navigate("/dashboard")  // Redirect to dashboard
+
+                // Check if user profile exists
+                const profileResponse = await api.getProfile(result.userId)
+
+                if (profileResponse && profileResponse.data) {
+                    // Profile exists - redirect to dashboard
+                    navigate("/")
+                } else {
+                    // Profile doesn't exist - redirect to signup/profile creation
+                    navigate("/signup")
+                }
             } else {
                 setError(result.error || "Login failed")
             }
@@ -50,8 +60,8 @@ export default function Login() {
                 style={{
                     padding: '12px 30px',
                     fontSize: '16px',
-                    backgroundColor: '#4285F4',
-                    color: 'white',
+                    backgroundColor: '#ffffff',
+                    color: 'black',
                     border: 'none',
                     borderRadius: '5px',
                     cursor: loading ? 'not-allowed' : 'pointer',
