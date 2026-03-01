@@ -1,4 +1,5 @@
 // googleCalendar.js edits - handles OAuth flow and calendar API calls
+// gets actual raw data from google calendar api 
 const { google } = require('googleapis');
 
 const createOAuthClient = () => {
