@@ -1,5 +1,5 @@
 // backend/userService.js
-import { db } from "./firebase";
+import { db } from "./firebase.js";
 import {
   doc,
   setDoc,
