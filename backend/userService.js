@@ -41,7 +41,7 @@ export async function getUserProfile(userId) {
     if (snapshot.exists()) {
       // If the document exists, return its data as a JS object
       return snapshot.data();
-    } 
+    }
     else {
       // If it doesn't exist, return null
       return null;

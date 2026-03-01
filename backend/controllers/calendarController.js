@@ -1,6 +1,8 @@
 // calendarController.js - handles routes for calendar integration (OAuth and events)
 import * as googleCalendar from '../algorithms/googleCalendar.js';
 import * as tokenStore from '../algorithms/tokenStore.js';
+import * as userService from '../services/userService.js'; // To update user profile with calendar info
+import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js'; // To calculate free slots from events
 
 // Return an auth URL to start OAuth flow
 export function getAuthUrl(req, res) {
@@ -20,9 +22,22 @@ export async function oauthCallback(req, res) {
     if (!code) return res.status(400).json({ success: false, error: 'Missing code' });
 
     const tokens = await googleCalendar.getTokensFromCode(code);
-    await tokenStore.saveTokens(userId, tokens);
 
-    res.json({ success: true, message: 'Tokens saved', userId });
+    // 2. Fetch the busy events immediately
+    const now = new Date().toISOString();
+    const rawEvents = await googleCalendar.listEvents(tokens, { timeMin: now, maxResults: 100 });
+
+    // 3. TRANSFORM: Turn raw Google events into "Free Slots"
+    // Import gcalAlgorithm at the top of this file to use this
+    const freeSlots = gcalAlgorithm.calculateFreeSlots(rawEvents);
+
+    await tokenStore.saveTokens(userId, tokens);
+    await userService.updateUserProfile(userId, {
+      availability: freeSlots,
+      calendarConnected: true
+    });
+
+    res.json({ success: true, message: /*'Tokens saved', userId, freeSlots }*/'Google Calendar connected successfully', userId });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
