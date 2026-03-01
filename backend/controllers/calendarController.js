@@ -20,7 +20,7 @@ export async function oauthCallback(req, res) {
     if (!code) return res.status(400).json({ success: false, error: 'Missing code' });
 
     const tokens = await googleCalendar.getTokensFromCode(code);
-    tokenStore.saveTokens(userId, tokens);
+    await tokenStore.saveTokens(userId, tokens);
 
     res.json({ success: true, message: 'Tokens saved', userId });
   } catch (err) {
@@ -32,7 +32,7 @@ export async function oauthCallback(req, res) {
 export async function getEvents(req, res) {
   try {
     const { userId } = req.params;
-    const tokens = tokenStore.getTokens(userId);
+    const tokens = await tokenStore.getTokens(userId);
     if (!tokens) return res.status(404).json({ success: false, error: 'No tokens for this user' });
 
     const now = new Date().toISOString();
