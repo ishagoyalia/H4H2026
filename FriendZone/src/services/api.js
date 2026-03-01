@@ -210,10 +210,10 @@ export const api = {
     },
 
     updateProfile: async (userId, profileData) => {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            method: 'PUT',
+        const response = await fetch(`${API_BASE_URL}/users`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(profileData),
+            body: JSON.stringify({ userId, ...profileData }),
         });
         return response.json();
     },
