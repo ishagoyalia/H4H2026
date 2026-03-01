@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 
 export default function login() {
     const [username, setUser] = useState("")
@@ -19,13 +20,15 @@ export default function login() {
                     onChange={(e) => setUser(e.target.value)}
                     required
                 />
-
                 <input //Password input
                     type="Password"
                     placeholder="Enter your password"
-                    value={username}
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                 />
+
+                <Link to="/"><button type="Submit"> Login</button></Link>
             </form>
 
         </div>
