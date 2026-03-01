@@ -1,5 +1,7 @@
 import * as matchAlgorithm from '../algorithms/interestsAlgorithm.js';
 import * as combinedScore from '../algorithms/combinedScore.js';
+import * as userService from '../userService.js';
+import * as scheduleMatchService from '../services/scheduleMatchService.js';
 
 // Get matches for a user with custom weights
 export async function getMatches(req, res) {
@@ -10,37 +12,46 @@ export async function getMatches(req, res) {
     // Example: /api/matches/123?interests=50&schedule=30&mbti=20
     const { interests, schedule, mbti, preference } = req.query;
 
-    // Mock user data - replace with actual database query
+    // Fetch real user data from Firebase
+    const userProfile = await userService.getUserProfile(userId);
+
+    if (!userProfile) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    // Build user object with Firebase data
     const user = {
       id: userId,
-      interests: ['coding', 'music'],
-      availability: [
-        { day: 'Monday', startTime: '14:00', endTime: '17:00' },
-        { day: 'Wednesday', startTime: '10:00', endTime: '12:00' },
-      ],
-      mbti: 'INFJ',
+      ...userProfile,
     };
 
-    const allUsers = [
-      {
-        id: '2',
-        name: 'Alex',
-        interests: ['coding', 'gaming'],
-        availability: [
-          { day: 'Monday', startTime: '15:00', endTime: '18:00' },
-        ],
-        mbti: 'ENFP',
-      },
-      {
-        id: '3',
-        name: 'Sam',
-        interests: ['music', 'art'],
-        availability: [
-          { day: 'Wednesday', startTime: '09:00', endTime: '11:00' },
-        ],
-        mbti: 'INTJ',
-      },
-    ];
+    // Fetch Google Calendar availability if user has it connected
+    try {
+      const calendarData = await scheduleMatchService.getUserAvailability(userId);
+      user.availability = calendarData.availability;
+    } catch (error) {
+      // User doesn't have Google Calendar connected or no tokens
+      // Use manual availability from profile or empty array
+      console.log(`No Google Calendar for user ${userId}, using manual availability`);
+      user.availability = userProfile.availability || [];
+    }
+
+    // Fetch all other users from Firebase
+    const allUsers = await userService.getAllUsers();
+
+    // Fetch Google Calendar availability for each user if available
+    for (const otherUser of allUsers) {
+      try {
+        const calendarData = await scheduleMatchService.getUserAvailability(otherUser.id);
+        otherUser.availability = calendarData.availability;
+      } catch (error) {
+        // User doesn't have Google Calendar - use manual availability
+        otherUser.availability = otherUser.availability || [];
+      }
+    }
 
     let matches;
     let weights = null;
