@@ -18,22 +18,30 @@ function convertEventsToAvailability(events) {
         const startDate = new Date(event.start.dateTime || event.start.date);
         const endDate = new Date(event.end.dateTime || event.end.date);
 
-        // Use ISO date string as "day" so algorithm can match exact dates
-        const isoDate = startDate.toISOString().split('T')[0];
+        // Use LOCAL date (not UTC) to match with local times
+        const year = startDate.getFullYear();
+        const month = String(startDate.getMonth() + 1).padStart(2, '0');
+        const day = String(startDate.getDate()).padStart(2, '0');
+        const isoDate = `${year}-${month}-${day}`;
 
-        // Format time as HH:MM
+        // Format time as HH:MM (local time)
         const startTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
         const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
 
-        return {
+        const busyBlock = {
             date: isoDate, // YYYY-MM-DD
             day: isoDate, // Algorithm uses "day" field - we use actual date here
             startTime,
             endTime,
             title: event.summary || 'Busy',
         };
+
+        console.log(`🔄 Event "${event.summary}": ${isoDate} ${startTime}-${endTime}`);
+
+        return busyBlock;
     });
 
+    console.log(`🔄 Total busy blocks created: ${busyBlocks.length}`);
     if (busyBlocks.length > 0) {
         console.log(`🔄 First busy block:`, busyBlocks[0]);
     }
