@@ -1,4 +1,3 @@
-import * as matchAlgorithm from '../algorithms/interestsAlgorithm.js';
 import * as combinedScore from '../algorithms/combinedScore.js';
 import * as userService from '../userService.js';
 import * as scheduleMatchService from '../services/scheduleMatchService.js';
