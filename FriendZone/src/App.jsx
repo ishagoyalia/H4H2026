@@ -52,36 +52,6 @@ const styles = `
     letter-spacing: 0.3px;
   }
 
-  .stats-row {
-    display: flex;
-    gap: 10px;
-  }
-
-  .stat {
-    background: var(--card-bg);
-    vorder: 1px solid var(--border);
-    border-radius: 50px;
-    padding; 5px 20px;
-    display: flex;
-    align-items: cetner;
-    gap: 7px;
-  }
-
-  .stat-online {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .stat-offline {
-    background: var(--brown-light);
-  }
-  .stat-text {
-    font-size: 13px;
-    font-weight: 500;
-    color: #5C1E0A;
-  }
 `
 
 const CalendarIcon = ({ color="#fff", size=20 }) => {
@@ -113,16 +83,8 @@ function App() {
               </div>
               
               <div className="main-content">
-                <div className="stats-row">
-                  <div className="stat">
-                    <div className="stat-text">
-                      <h2 className="stat-online"> 3 friends free right now </h2>
-                      <br></br>
-                      <h2 className="stat-offline"> 6 friends total </h2>
-                    </div>
-                  </div> 
-                  
-                </div>
+                
+                
               </div>
             </div>
 
