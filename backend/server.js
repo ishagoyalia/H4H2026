@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173' // This specifically allows your Vite port }));
+  origin: ['http://localhost:5173', 'http://localhost:5000', 'https://friendzone-417c2.firebaseapp.com', 'https://friendzone-417c2.web.app'],
+  credentials: true
 }));
 app.use(express.json());
 
