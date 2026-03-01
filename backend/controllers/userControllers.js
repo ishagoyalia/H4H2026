@@ -4,13 +4,26 @@ import * as userService from '../userService.js';
 // Create or update a user profile
 export async function createOrUpdateUser(req, res) {
     try {
-        const { userId, ...profileData } = req.body;
+        const { userId, tokens, ...profileData } = req.body;
 
         if (!userId) {
             return res.status(400).json({
                 success: false,
                 error: 'userId is required'
             });
+        }
+        //@3:47pm
+        // NEW: Auto-save Google Calendar tokens from Firebase Auth
+        if (tokens && tokens.accessToken) {
+            console.log('✅ Calendar tokens received from Firebase Auth login');
+            profileData.googleCalendarTokens = {
+                access_token: tokens.accessToken,
+                scope: tokens.signInMethod || 'google.com',
+                token_type: 'Bearer',
+                expiry_date: new Date(Date.now() + 3600000).toISOString(), // 1 hour
+                source: 'firebase_auth'
+            };
+            profileData.calendarConnected = true;
         }
 
         // Check if onboarding is complete (has interests and MBTI)
@@ -29,7 +42,8 @@ export async function createOrUpdateUser(req, res) {
             success: true,
             message: 'User profile saved successfully',
             userId,
-            onboardingComplete: profileData.onboardingComplete || false
+            onboardingComplete: profileData.onboardingComplete || false,
+            calendarConnected: profileData.calendarConnected || false
         });
     } catch (error) {
         res.status(500).json({
