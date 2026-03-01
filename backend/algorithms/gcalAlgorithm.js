@@ -10,6 +10,9 @@
  * @returns {Array} - Users with schedule overlap scores
  */
 export function findScheduleMatches(user, allUsers) {
+  // SETTING: Minimum duration for a hangout (0.5 = 30 minutes)
+  const MIN_HANGOUT_DURATION = 0.5;
+
   // Calculate schedule compatibility for each user
   const scheduleMatches = allUsers
     // Remove the current user
@@ -23,8 +26,11 @@ export function findScheduleMatches(user, allUsers) {
         otherUser.availability || []
       );
 
+      // Filter out tiny fragments before calculating the total
+      const qualitySlots = overlappingSlots.filter(slot => slot.duration >= MIN_HANGOUT_DURATION);
+
       // Calculate match score based on number of overlapping hours
-      const totalOverlapHours = overlappingSlots.reduce(
+      const totalOverlapHours = qualitySlots.reduce(
         (sum, slot) => sum + slot.duration,
         0
       );
@@ -120,6 +126,32 @@ function calculateOverlap(slot1, slot2) {
 }
 
 /**
+ * Calculate schedule compatibility between two specific users
+ */
+export function calculateScheduleCompatibility(user1, user2) {
+  const MIN_HANGOUT_DURATION = 0.5; // Keeping this consistent
+
+  const overlappingSlots = findOverlappingTimeSlots(
+    user1.availability || [],
+    user2.availability || []
+  );
+
+  // Filter out tiny fragments here as well
+  const qualitySlots = overlappingSlots.filter(slot => slot.duration >= MIN_HANGOUT_DURATION);
+
+  const totalOverlapHours = qualitySlots.reduce(
+    (sum, slot) => sum + slot.duration,
+    0
+  );
+
+  return {
+    score: Math.min((totalOverlapHours / 5) * 100, 100),
+    overlappingSlots: qualitySlots,
+    totalOverlapHours,
+  };
+}
+
+/**
  * Convert time string to minutes since midnight
  * @param {String} time - Time in format "HH:MM" (e.g., "14:30")
  * @returns {Number} - Minutes since midnight
@@ -138,30 +170,6 @@ function minutesToTime(minutes) {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-}
-
-/**
- * Calculate schedule compatibility between two specific users
- * @param {Object} user1 - First user
- * @param {Object} user2 - Second user
- * @returns {Object} - Schedule compatibility score and details
- */
-export function calculateScheduleCompatibility(user1, user2) {
-  const overlappingSlots = findOverlappingTimeSlots(
-    user1.availability || [],
-    user2.availability || []
-  );
-
-  const totalOverlapHours = overlappingSlots.reduce(
-    (sum, slot) => sum + slot.duration,
-    0
-  );
-
-  return {
-    score: Math.min((totalOverlapHours / 20) * 100, 100),
-    overlappingSlots,
-    totalOverlapHours,
-  };
 }
 
 /**
