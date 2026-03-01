@@ -1,4 +1,4 @@
-//@5:53, edited login.jsx to handle pop up google login 
+//@5:53, edited login.jsx to handle pop up google login EDITED
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api } from "../services/api"  // Import the api service
