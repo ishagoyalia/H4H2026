@@ -6,22 +6,22 @@ import { api } from "../services/api.js"  // Import the api service
 
 const hobbyWeights = [
     // Sports hobbies
-    'basketball'
-    'football'
-    'baseball'
-    'tennis'
-    'swimming'
+    'basketball',
+    'football',
+    'baseball',
+    'tennis',
+    'swimming',
     // Social life hobbies
-    'music'
-    'dancing'
-    'cooking'
-    'traveling'
-    'gaming'
+    'music',
+    'dancing',
+    'cooking',
+    'traveling',
+    'gaming',
     // Academics hobbies
-    'math'
-    'science'
-    'literature'
-    'history'
+    'math',
+    'science',
+    'literature',
+    'history',
     'art'
 ];
 
