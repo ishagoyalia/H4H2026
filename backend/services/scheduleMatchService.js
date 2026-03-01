@@ -13,7 +13,8 @@ import * as tokenStore from '../algorithms/tokenStore.js';
  * @returns {Array} - Availability slots with day, startTime, endTime
  */
 function convertEventsToAvailability(events) {
-    return events.map((event) => {
+    console.log(`🔄 Converting ${events.length} Google Calendar events to busy blocks`);
+    const busyBlocks = events.map((event) => {
         const startDate = new Date(event.start.dateTime || event.start.date);
         const endDate = new Date(event.end.dateTime || event.end.date);
 
@@ -32,6 +33,12 @@ function convertEventsToAvailability(events) {
             title: event.summary || 'Busy',
         };
     });
+
+    if (busyBlocks.length > 0) {
+        console.log(`🔄 First busy block:`, busyBlocks[0]);
+    }
+
+    return busyBlocks;
 }
 
 /**

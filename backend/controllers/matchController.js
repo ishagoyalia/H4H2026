@@ -21,16 +21,28 @@ export async function getMatches(req, res) {
       try {
         // Only fetch if they have a calendar connected
         if (otherUser.calendarConnected) {
+          console.log(`📅 Fetching calendar for user ${otherUser.id}`);
           const calendarData = await scheduleMatchService.getUserAvailability(otherUser.id);
 
+          console.log(`📅 User ${otherUser.id}: Found ${calendarData.availability?.length || 0} busy blocks`);
+          if (calendarData.availability && calendarData.availability.length > 0) {
+            console.log(`📅 Sample busy block:`, calendarData.availability[0]);
+          }
+
           // INVERSION: Convert busy events to free slots before matching
+          const freeSlots = gcalAlgorithm.calculateFreeSlots(calendarData.availability);
+          console.log(`✨ User ${otherUser.id}: Calculated ${freeSlots.length} free slots`);
+          if (freeSlots.length > 0) {
+            console.log(`✨ Sample free slot:`, freeSlots[0]);
+          }
+
           return {
             ...otherUser,
-            availability: gcalAlgorithm.calculateFreeSlots(calendarData.availability)
+            availability: freeSlots
           };
         }
       } catch (err) {
-        console.error(`Calendar fetch failed for ${otherUser.id}:`, err.message);
+        console.error(`❌ Calendar fetch failed for ${otherUser.id}:`, err.message);
       }
       // Fallback to manual availability if Google fails or isn't connected
       return { ...otherUser, availability: otherUser.availability || [] };
