@@ -10,10 +10,19 @@
  * @returns {Array} - Sorted array of matches with scores
  */
 export function findMatches(user, allUsers) {
+  // Check if user has interests
+  if (!user.interests || !Array.isArray(user.interests) || user.interests.length === 0) {
+    console.warn('User has no interests set');
+    return [];
+  }
+
   // Step 1: Filter, Score, Sort
   const matches = allUsers
     // Remove the current user from potential matches
     .filter(otherUser => otherUser.id !== user.id)
+
+    // Only include users who have interests
+    .filter(otherUser => otherUser.interests && Array.isArray(otherUser.interests) && otherUser.interests.length > 0)
 
     // Calculate match score for each potential friend
     .map(otherUser => {
