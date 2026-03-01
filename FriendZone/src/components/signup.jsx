@@ -90,7 +90,10 @@ export default function signup() {
                 onChange={(e) => setMBTI(e.target.value)}
                 required
             />
+
             <Link to="/"><button type="Submit" onClick={handleSubmit}> Submit </button></Link>
+            <p> </p>
+            <Link to="https://www.16personalities.com/free-personality-test" target="_blank">If you don't know your MBTI type, click here to find out!</Link>
         </div>
     )
 }
