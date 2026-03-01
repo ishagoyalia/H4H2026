@@ -13,7 +13,7 @@ import {
     onAuthStateChanged,  // Listens to auth state changes
     signOut  // Signs out the current user
 } from 'firebase/auth';
-import { auth } from '../firebase'; // Firebase auth instance (configured in firebase.js)
+import { auth } from '../../../backend/firebase'; // Firebase auth instance (configured in firebase.js)
 
 const API_BASE_URL = 'http://localhost:5000/api';
 

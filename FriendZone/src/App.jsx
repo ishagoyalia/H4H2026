@@ -19,12 +19,35 @@ const styles = `
   .home-screen {
     background: #452d08ff;
     font-family: 'DM Sans', sans-serif;
+    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     justify-content: center;  /* vertical centering */
     align-items: center;      /* horizontal centering */
     min-height: calc(100vh - 80px); /* full viewport minus top nav height */
     width: 100vw;              /* full width */
+  }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    grid-template-rows: repeat(2, 150px)
+    grid-gap: 20px; /* space between boxes */
+    width: 80%; /* optional: grid width inside home-screen */
+    max-width: 600px; /* optional max width */
+  }
+
+  .grid-box {
+    background: #1e0b98ff; /* any color you like */
+    border-radius: 20px; /* rounded corners */
+    height: 150px; /* box height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #00aaffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
 `;
 
