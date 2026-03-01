@@ -492,20 +492,34 @@ function Explore({ showPopup, setShowPopup }) {
                 <div style={{ marginTop: "15px" }}>
                   <p><strong>Times You're Both Available:</strong></p>
                   {selectedUser.matchDetails.overlappingSlots.slice(0, 5).map((slot, idx) => {
-                    // Format the day nicely (convert ISO date to readable format)
-                    let displayDay = slot.day;
-                    try {
-                      const date = new Date(slot.day);
-                      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      displayDay = `${dayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`;
-                    } catch (e) {
-                      // If date parsing fails, use original day value
+                    // Debug: Log the slot data to console (first slot only)
+                    if (idx === 0) console.log('Overlapping slot data:', JSON.stringify(slot, null, 2));
+
+                    let displayDay = slot.day || 'Unknown Day';
+
+                    // Check if day is an ISO date (YYYY-MM-DD format) or a day name (Monday, Tuesday, etc.)
+                    if (slot.day) {
+                      if (slot.day.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        // It's an ISO date (2026-03-05)
+                        try {
+                          const date = new Date(slot.day);
+                          if (!isNaN(date.getTime())) {
+                            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            displayDay = `${dayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`;
+                          }
+                        } catch (e) {
+                          console.error('Date parsing error:', e);
+                        }
+                      } else {
+                        // It's already a day name (Monday, Tuesday, etc.) - use as is
+                        displayDay = slot.day;
+                      }
                     }
 
                     return (
                       <p key={idx} style={{ fontSize: "14px" }}>
-                        {displayDay}: {slot.startTime} - {slot.endTime}
+                        {displayDay}: {slot.startTime || '??:??'} - {slot.endTime || '??:??'}
                       </p>
                     );
                   })}
