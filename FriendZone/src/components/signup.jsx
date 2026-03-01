@@ -35,6 +35,7 @@ export default function signup() {
         }
 
         // Save interest and MBTI for matching algorithm
+        // Backend will merge with existing data (name, email, tokens preserved)
         await api.updateProfile(userId, {
             interests: [hobbies],
             mbti: MBTI.toUpperCase()  // Ensure uppercase (ENFP not enfp)

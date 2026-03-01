@@ -10,12 +10,13 @@ const createOAuthClient = () => {
   );
 };
 
-function generateAuthUrl() {
+function generateAuthUrl(userId) {
   const oAuth2Client = createOAuthClient();
   return oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    state: userId // Pass userId so we know who authorized
   });
 }
 

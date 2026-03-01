@@ -524,10 +524,123 @@ function Explore({ showPopup, setShowPopup }) {
 }
 
 function Profile() {
+  const [calendarStatus, setCalendarStatus] = useState('unknown');
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    // Check if just returned from OAuth (calendar=connected in URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('calendar') === 'connected') {
+      setShowSuccess(true);
+      setCalendarStatus('connected');
+      // Clean up URL
+      window.history.replaceState({}, document.title, '/profile');
+
+      // Hide success message after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
+    }
+
+    // Check if calendar is already connected
+    const checkCalendarStatus = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const response = await api.getProfile(userId);
+          if (response.user && response.user.calendarConnected) {
+            setCalendarStatus('connected');
+          } else {
+            setCalendarStatus('not_connected');
+          }
+        } catch (error) {
+          console.error('Failed to check calendar status:', error);
+          setCalendarStatus('error');
+        }
+      }
+    };
+
+    checkCalendarStatus();
+  }, []);
+
+  const handleConnectCalendar = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('Please login first');
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      const response = await api.getCalendarAuthUrl(userId);
+      if (response.success && response.url) {
+        // Redirect to Google OAuth
+        window.location.href = response.url;
+      } else {
+        alert('Failed to get calendar auth URL');
+      }
+    } catch (error) {
+      console.error('Error connecting calendar:', error);
+      alert('Failed to connect calendar');
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
   return (
     <div className="home-screen" style={{ color: "#e97439" }}>
       <h1>Profile Settings</h1>
       <p>Edit your info here.</p>
+
+      {showSuccess && (
+        <div style={{
+          background: "#4CAF50",
+          color: "white",
+          padding: "15px 25px",
+          borderRadius: "8px",
+          marginTop: "20px",
+          animation: "fadeIn 0.5s"
+        }}>
+          ✅ Calendar connected successfully! Schedule matching is now enabled.
+        </div>
+      )}
+
+      <div style={{ marginTop: "30px" }}>
+        <h2 style={{ fontSize: "20px", marginBottom: "15px" }}>Google Calendar Integration</h2>
+
+        {calendarStatus === 'connected' ? (
+          <div style={{
+            background: "#4CAF50",
+            color: "white",
+            padding: "15px 25px",
+            borderRadius: "8px",
+            display: "inline-block"
+          }}>
+            ✅ Calendar Connected
+          </div>
+        ) : (
+          <button
+            onClick={handleConnectCalendar}
+            disabled={isConnecting}
+            style={{
+              background: "linear-gradient(to right, #e97439ff, #b74bd7ff)",
+              color: "white",
+              border: "none",
+              padding: "15px 30px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              borderRadius: "8px",
+              cursor: isConnecting ? "not-allowed" : "pointer",
+              opacity: isConnecting ? 0.6 : 1,
+            }}
+          >
+            {isConnecting ? "Connecting..." : "📅 Connect Google Calendar"}
+          </button>
+        )}
+
+        <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
+          Connect your calendar to enable schedule-based matching
+        </p>
+      </div>
     </div>
   );
 }

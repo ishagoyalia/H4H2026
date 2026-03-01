@@ -226,4 +226,10 @@ export const api = {
         });
         return response.json();
     },
+
+    // Get Google Calendar OAuth URL
+    getCalendarAuthUrl: async (userId) => {
+        const response = await fetch(`${API_BASE_URL}/calendar/auth?userId=${userId}`);
+        return response.json();
+    },
 };

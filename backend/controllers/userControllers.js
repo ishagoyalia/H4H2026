@@ -14,16 +14,26 @@ export async function createOrUpdateUser(req, res) {
         }
         //@3:47pm
         // NEW: Auto-save Google Calendar tokens from Firebase Auth
-        if (tokens && tokens.accessToken) {
-            console.log('✅ Calendar tokens received from Firebase Auth login');
-            profileData.googleCalendarTokens = {
-                access_token: tokens.accessToken,
-                scope: tokens.signInMethod || 'google.com',
-                token_type: 'Bearer',
-                expiry_date: new Date(Date.now() + 3600000).toISOString(), // 1 hour
-                source: 'firebase_auth'
-            };
-            profileData.calendarConnected = true;
+        if (tokens) {
+            console.log('📅 Full credential object:', JSON.stringify(tokens, null, 2));
+
+            // Firebase credential has oauthAccessToken, not accessToken
+            const accessToken = tokens.oauthAccessToken || tokens.accessToken;
+
+            if (accessToken) {
+                console.log('✅ Calendar tokens saved from Firebase Auth login');
+                profileData.googleCalendarTokens = {
+                    access_token: accessToken,
+                    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+                    token_type: 'Bearer',
+                    expiry_date: new Date(Date.now() + 3600000).toISOString(), // 1 hour
+                    source: 'firebase_auth'
+                };
+                profileData.calendarConnected = true;
+            } else {
+                console.warn('⚠️ No access token found in credential object');
+                console.warn('⚠️ Calendar will not be connected automatically');
+            }
         }
 
         // Check if onboarding is complete (has interests and MBTI)

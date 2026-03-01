@@ -7,7 +7,12 @@ import * as gcalAlgorithm from '../algorithms/gcalAlgorithm.js'; // To calculate
 // Return an auth URL to start OAuth flow
 export function getAuthUrl(req, res) {
   try {
-    const url = googleCalendar.generateAuthUrl();
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'userId is required' });
+    }
+    // Pass userId as state so it comes back in the callback
+    const url = googleCalendar.generateAuthUrl(userId);
     res.json({ success: true, url });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -32,12 +37,13 @@ export async function oauthCallback(req, res) {
     const freeSlots = gcalAlgorithm.calculateFreeSlots(rawEvents);
 
     await tokenStore.saveTokens(userId, tokens);
-    await userService.updateUserProfile(userId, {
+    await userService.saveUserProfile(userId, {
       availability: freeSlots,
       calendarConnected: true
     });
 
-    res.json({ success: true, message: /*'Tokens saved', userId, freeSlots }*/'Google Calendar connected successfully', userId });
+    // Redirect back to frontend with success message
+    res.redirect('http://localhost:5173/profile?calendar=connected');
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

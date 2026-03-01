@@ -16,11 +16,11 @@ import {
 export async function saveUserProfile(userId, profileData) {
   try {
     // doc(db, "users", userId) → gets a reference to the document in the "users" collection with ID userId
-    // setDoc() → writes data to that document
+    // setDoc() with merge:true → MERGES data instead of overwriting (preserves name, email, etc.)
     await setDoc(doc(db, "users", userId), {
       ...profileData,   // Spread operator: adds all fields from profileData
       updatedAt: new Date(),    // Adds a timestamp so you know when the profile was last updated
-    });
+    }, { merge: true });
   } catch (error) {
     // If something goes wrong (network issues, permissions), log the error and rethrow it
     console.error("Error saving profile:", error);
