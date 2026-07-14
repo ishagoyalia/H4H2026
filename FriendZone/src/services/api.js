@@ -227,6 +227,47 @@ export const api = {
         return response.json();
     },
 
+    connectGoogleCalendar: async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+            provider.addScope('https://www.googleapis.com/auth/userinfo.email');
+            provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const accessToken = credential?.accessToken || credential?.oauthAccessToken || result?._tokenResponse?.oauthAccessToken;
+            const idToken = await user.getIdToken();
+
+            await fetch(`${API_BASE_URL}/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.uid,
+                    email: user.email,
+                    name: user.displayName,
+                    tokens: credential,
+                    idToken,
+                    accessToken,
+                }),
+            });
+
+            return {
+                success: true,
+                userId: user.uid,
+                email: user.email,
+                name: user.displayName,
+                accessToken,
+                idToken,
+                credential,
+            };
+        } catch (error) {
+            console.error('Calendar connect error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
     // Get Google Calendar OAuth URL
     getCalendarAuthUrl: async (userId) => {
         const response = await fetch(`${API_BASE_URL}/calendar/auth?userId=${userId}`);

@@ -611,12 +611,14 @@ function Profile() {
 
     setIsConnecting(true);
     try {
-      const response = await api.getCalendarAuthUrl(userId);
-      if (response.success && response.url) {
-        // Redirect to Google OAuth
-        window.location.href = response.url;
+      const response = await api.connectGoogleCalendar();
+      if (response?.success) {
+        setCalendarStatus('connected');
+        setShowSuccess(true);
+        window.history.replaceState({}, document.title, '/profile');
+        setTimeout(() => setShowSuccess(false), 5000);
       } else {
-        alert('Failed to get calendar auth URL');
+        alert(response?.error || 'Google Calendar access is currently blocked. Please make sure your Google account is allowed for this app and try again.');
       }
     } catch (error) {
       console.error('Error connecting calendar:', error);
